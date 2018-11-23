@@ -7,3 +7,68 @@
 //
 
 #include "CubeUnitFactory.hpp"
+#include <sstream>
+
+
+// This is not a very robust parser
+Cube* CubeUnitFactory::ParseCubeUnit(std::stringstream &description, unsigned int id) {
+    unsigned short x, y, z;
+    description >> x >> y >> z;
+    bool cubeLocation[z][y][x];
+    for(int i = 0; i < z; i++) {
+        for(int j = 0; j < y; j++) {
+            for(int k = 0; k < x; k++) {
+                description >> cubeLocation[i][j][k];
+            }
+        }
+    }
+    // build a dynamically-allocated cube unit based on the description
+    Cube* head = nullptr;
+    Cube* curr;
+    Cube* cubeUnit[z][y][x];
+    for(int i = 0; i < z; i++) {
+        for(int j = 0; j < y; j++) {
+            for(int k = 0; k < x; k++) {
+                // if there is a cube in that location
+                if(cubeLocation[i][j][k]) {
+                    // create a new cube
+                    curr = new Cube(id);
+                    // if the head is null, set it as head
+                    if(!head) {
+                        head = curr;
+                    }
+                    // put the cube into the array
+                    cubeUnit[i][j][k] = curr;
+                    // if there is a cube in the neg x direction, connect it
+                    if(k > 0 && cubeLocation[i][j][k-1]) {
+                        JoinX(cubeUnit[i][j][k-1], curr);
+                    }
+                    // if there is a cube in the neg y direction, connect it
+                    if(j > 0 && cubeLocation[i][j-1][k]) {
+                        JoinY(cubeUnit[i][j-1][k], curr);
+                    }
+                    // if there is a cube in the neg z direction, connect it
+                    if(i > 0 && cubeLocation[i-1][j][k]) {
+                        JoinZ(cubeUnit[i-1][j][k], curr);
+                    }
+                }
+            }
+        }
+    }
+    // set head location to origin and update cube unit's location
+    head->SetLocation(0, 0, 0);
+    head->UpdateCubeUnitLocation();
+    return head;
+}
+
+CubeUnitFactory& CubeUnitFactory::instance() {
+    static CubeUnitFactory* instance;
+    if(!instance) {
+        instance = new CubeUnitFactory();
+    }
+    return *instance;
+}
+
+CubeUnitFactory::CubeUnitFactory() {
+    
+}

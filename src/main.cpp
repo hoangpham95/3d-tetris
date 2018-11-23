@@ -9,25 +9,30 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <string>
+#include <sstream>
 
+#include "CubeUnitFactory.hpp"
+
+using namespace std;
 
 #include "Cube.hpp"
 
 int main(int argc, const char * argv[]) {
     // create a csv for recording cubes location
-    std::ofstream myCSV;
+    ofstream myCSV;
     // use std::ios::app as the second argument if don't want to overwrite
-    myCSV.open("/Users/zhongzachary/Desktop/cubes.txt");
+    myCSV.open("./cubes.txt");
     
     // create cubes
-    std::vector<Cube*> cubes;
+    vector<Cube*> cubes;
     for(int i = 0; i < 5; i++) {
         cubes.push_back(new Cube(i));
     }
     /*
-        0^
-       12y
-       34|
+     0^
+     12y
+     34|
      <z--+
      */
     JoinZ(cubes[4], cubes[3]);
@@ -35,40 +40,25 @@ int main(int argc, const char * argv[]) {
     JoinY(cubes[4], cubes[2]);
     JoinY(cubes[3], cubes[1]);
     JoinY(cubes[2], cubes[0]);
+    
     cubes[0]->SetLocation(10,10,10);
-    cubes[0]->UpdateNeighborLocation();
-    for(Cube *c : cubes) {
-        std::cout << c;
-    }
+    cubes[0]->UpdateCubeUnitLocation();
     ExportLocationAsCSV(myCSV, &cubes[0], cubes.size());
-    std::cout << '\n';
-    /*
-         ^
-      024y
-       13|
-     <z--+
-     */
-    cubes[0]->RotateNeighborX();
-    ExportLocationAsCSV(myCSV, &cubes[0], cubes.size());
-    for(Cube *c : cubes) {
-        std::cout << c;
-    }
-    std::cout << '\n';
-//    CUBE_PrintType = false;
-//    CUBE_PrintDataName = false;
-//    CUBE_PrintColor = false;
-//    CUBE_PrintLocation = true;
-    cubes[4]->RotateNeighborY();
-    for(Cube *c : cubes) {
-        std::cout << c;
-    }
-
-    std::cout << PrintLocationAsCSV(&(cubes[0]), cubes.size());
     
+    cubes[0]->RotateCubeUnitOverX();
     ExportLocationAsCSV(myCSV, &cubes[0], cubes.size());
-
+    
+    cubes[4]->RotateCubeUnitOverY();
+    ExportLocationAsCSV(myCSV, &cubes[0], cubes.size());
+    
+    string description = "3 2 2 1 0 1 1 1 1 0 1 0 0 1 1";
+    stringstream ssDescription(description);
+    Cube *cubeUnit = CubeUnitFactory::instance().ParseCubeUnit(ssDescription, 1);
+    std::cout << cubeUnit->PrintCubeUnitLocationAsCSV();
+    cubeUnit->ExportCubeUnitLocationAsCSV(myCSV);
+    
+    
     myCSV.close();
-    
     
     return 0;
 }
