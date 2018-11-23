@@ -43,8 +43,10 @@ public:
     inline Cube* GetYPos() const {return m_yPos;};
     inline Cube* GetZNeg() const {return m_zNeg;};
     inline Cube* GetZPos() const {return m_zPos;};
-    // return a vector storing the entire Cube Unit, i.e. all the cubes that are connected to this
+    // return a vector storing the entire Cube Unit
     std::vector<Cube*>& GetCubeUnit();
+    // duplicate the entire Cube Unit
+    Cube* DuplicateCubeUnit();
     // update the entire Cube Unit location based on the location of this
     void UpdateCubeUnitLocation();
     // rotate the whole piece of cubes that are connecting to this cube
@@ -66,6 +68,9 @@ public:
     friend std::string PrintLocationAsCSV(Cube** cubes, unsigned long size);
     friend void ExportLocationAsCSV(std::ofstream& file, Cube** cubes, unsigned long size);
 private:
+    // copy constructor
+    // !!! doesn't work for neighbor
+    Cube(const Cube& cube);
     // identifier
     const unsigned int m_id;
     // neighbors

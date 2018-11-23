@@ -7,6 +7,7 @@
 //
 
 #include "Cube.hpp"
+#include <unordered_map>
 
 Cube::Cube(unsigned int id) : m_id(id){
 }
@@ -285,6 +286,61 @@ void ExportLocationAsCSV(std::ofstream& file, Cube** cubes, unsigned long size =
         file << cubes[i]->m_xyz[1] << ',';
         file << cubes[i]->m_xyz[2] << std::endl;
     }
+}
+
+Cube::Cube(const Cube& cube) : m_id(cube.m_id) {
+    for(int i = 0; i < 4; ++i) {
+        m_rgba[i] = cube.m_rgba[i];
+    }
+    for(int i = 0; i < 3; ++i) {
+        m_xyz[i] = cube.m_xyz[i];
+    }
+}
+
+Cube* Cube::DuplicateCubeUnit() {
+    std::vector<Cube*> cubeUnit = GetCubeUnit();
+    std::unordered_map<Cube*, int> cubeUnitIdx;
+    std::vector<Cube*> dupCubeUnit;
+    dupCubeUnit.reserve(cubeUnit.size());
+    
+    for(int i = 0; i < cubeUnit.size(); ++i) {
+        cubeUnitIdx[cubeUnit[i]] = i;
+        Cube* tmp = new Cube(*cubeUnit[i]);
+        dupCubeUnit.push_back(tmp);
+    }
+    
+    for(int i = 0; i < cubeUnit.size(); ++i) {
+        Cube* wkc = cubeUnit[i];
+        Cube* dupWkc = dupCubeUnit[i];
+        // register neighbor
+        int tmp;
+        if(wkc->m_xNeg) {
+            tmp = cubeUnitIdx[wkc->m_xNeg];
+            dupWkc->m_xNeg = dupCubeUnit[tmp];
+        }
+        if(wkc->m_xPos) {
+            tmp = cubeUnitIdx[wkc->m_xPos];
+            dupWkc->m_xPos = dupCubeUnit[tmp];
+        }
+        if(wkc->m_yNeg) {
+            tmp = cubeUnitIdx[wkc->m_yNeg];
+            dupWkc->m_yNeg = dupCubeUnit[tmp];
+        }
+        if(wkc->m_yPos) {
+            tmp = cubeUnitIdx[wkc->m_yPos];
+            dupWkc->m_yPos = dupCubeUnit[tmp];
+        }
+        if(wkc->m_zNeg) {
+            tmp = cubeUnitIdx[wkc->m_zNeg];
+            dupWkc->m_zNeg = dupCubeUnit[tmp];
+        }
+        if(wkc->m_zPos) {
+            tmp = cubeUnitIdx[wkc->m_zPos];
+            dupWkc->m_zPos = dupCubeUnit[tmp];
+        }
+    }
+    
+    return dupCubeUnit[0];
 }
 
 
