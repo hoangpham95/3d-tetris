@@ -3,12 +3,12 @@
 
 ## Note that there are some name change for consistency purposes
 In `Cube` class
-`UpdateNeighborLocation` -> `UpdateCubeUnitLocation`
-`RotateNeighborX` -> `RotateCubeUnitOverX`
-`RotateNeighborY` -> `RotateCubeUnitOverY`
-`RotateNeighborZ` -> `RotateCubeUnitOverZ`
-`PrintNeighborLocationAsCSV` -> `PrintCubeUnitLocationAsCSV`
-`ExportNeighborLocationAsCSV` -> `ExportCubeUnitLocationAsCSV`
+- `UpdateNeighborLocation` -> `UpdateCubeUnitLocation`
+- `RotateNeighborX` -> `RotateCubeUnitOverX`
+- `RotateNeighborY` -> `RotateCubeUnitOverY`
+- `RotateNeighborZ` -> `RotateCubeUnitOverZ`
+- `PrintNeighborLocationAsCSV` -> `PrintCubeUnitLocationAsCSV`
+- `ExportNeighborLocationAsCSV` -> `ExportCubeUnitLocationAsCSV`
 
 ## Terminology 
 - Cube: a single cube in 3d-tetris
