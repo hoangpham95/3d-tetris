@@ -50,52 +50,8 @@ void JoinZ(Cube* zNeg, Cube* zPos) {
 }
 
 std::ostream& operator<<(std::ostream& out, const Cube& cube) {
-    out << (CUBE_PrintType ? "Cube(" : "");
-    // print id
-    if(CUBE_PrintID) {
-        if(CUBE_PrintDataName) {
-            out << "id:";
-        }
-        out << cube.GetID();
-    }
-    out << CUBE_PrimarySeperator;
-    // print color
-    if(CUBE_PrintColor) {
-        if(CUBE_PrintDataName) {
-            out << "rgba:";
-        }
-        for(int i = 0; i < 4; i++) {
-            out << cube.m_rgba[i];
-            if (i != 3) out << CUBE_SecondarySeperator;
-        }
-    }
-    out << CUBE_PrimarySeperator;
-    // print location
-    if(CUBE_PrintLocation) {
-        if(CUBE_PrintDataName) {
-            out << "xyz:";
-        }
-        for(int i = 0; i < 3; i++) {
-            out << cube.m_xyz[i];
-            if (i != 2) out << CUBE_SecondarySeperator;
-        }
-    }
-    out << CUBE_PrimarySeperator;
-    // print neighbor
-    if(CUBE_PrintNeighborID) {
-        if(CUBE_PrintDataName) {
-            out << "neighbor:";
-        }
-        out << cube.GetXNeg()->GetID() << CUBE_SecondarySeperator;
-        out << cube.GetXPos()->GetID() << CUBE_SecondarySeperator;
-        out << cube.GetYNeg()->GetID() << CUBE_SecondarySeperator;
-        out << cube.GetYPos()->GetID() << CUBE_SecondarySeperator;
-        out << cube.GetZNeg()->GetID() << CUBE_SecondarySeperator;
-        out << cube.GetZPos()->GetID() << CUBE_SecondarySeperator;
-    }
-    if(CUBE_PrintType) {
-        out << ")";
-    }
+    out << "Cube(id:" << cube.m_id;
+    out << "|xyz:" << cube.m_xyz[0] << "," << cube.m_xyz[1] << "," << cube.m_xyz[2] << ")";
     return out;
 }
 
@@ -121,7 +77,48 @@ void Cube::SetLocation(int x, int y, int z) {
     m_xyz[2] = z;
 }
 
-void Cube::UpdateNeighborLocation() {
+std::vector<Cube*>& Cube::GetCubeUnit() {
+    // initialize output
+    std::vector<Cube*>* output = new std::vector<Cube*>();
+    output->push_back(this);
+    
+    std::unordered_set<Cube*> visited;
+    std::unordered_set<Cube*> next;
+    next.insert(this);
+    
+    while(!next.empty()) {
+        // pop the first element in the queue as the working cube
+        Cube& wkc = **(next.begin());
+        next.erase(&wkc);
+        // add the working cube into output
+        output->push_back(&wkc);
+        // add the working cube into visited
+        visited.insert(&wkc);
+        // add each of the unvisited neighboring cubes to visited
+        if(wkc.m_xNeg && visited.count(wkc.m_xNeg) == 0) {
+            next.insert(wkc.m_xNeg);
+        }
+        if(wkc.m_xPos && visited.count(wkc.m_xPos) == 0) {
+            next.insert(wkc.m_xPos);
+        }
+        if(wkc.m_yNeg && visited.count(wkc.m_yNeg) == 0) {
+            next.insert(wkc.m_yNeg);
+        }
+        if(wkc.m_yPos && visited.count(wkc.m_yPos) == 0) {
+            next.insert(wkc.m_yPos);
+        }
+        if(wkc.m_zNeg && visited.count(wkc.m_zNeg) == 0) {
+            next.insert(wkc.m_zNeg);
+        }
+        if(wkc.m_zPos && visited.count(wkc.m_zPos) == 0) {
+            next.insert(wkc.m_zPos);
+        }
+    }
+    
+    return *output;
+}
+
+void Cube::UpdateCubeUnitLocation() {
     std::unordered_set<Cube*> visited;
     std::unordered_set<Cube*> next;
     next.insert(this);
@@ -164,7 +161,7 @@ void Cube::UpdateNeighborLocation() {
     
 }
 
-void Cube::RotateNeighborX(bool ccw) {
+void Cube::RotateCubeUnitOverX(bool ccw) {
     std::unordered_set<Cube*> visited;
     std::unordered_set<Cube*> next;
     next.insert(this);
@@ -188,10 +185,10 @@ void Cube::RotateNeighborX(bool ccw) {
         storeUnvisitedCube(&center, next, visited);
     }
     // update all cubes to the new location
-    UpdateNeighborLocation();
+    UpdateCubeUnitLocation();
 }
 
-void Cube::RotateNeighborY(bool ccw) {
+void Cube::RotateCubeUnitOverY(bool ccw) {
     std::unordered_set<Cube*> visited;
     std::unordered_set<Cube*> next;
     next.insert(this);
@@ -215,10 +212,10 @@ void Cube::RotateNeighborY(bool ccw) {
         storeUnvisitedCube(&center, next, visited);
     }
     // update all cubes to the new location
-    UpdateNeighborLocation();
+    UpdateCubeUnitLocation();
 }
 
-void Cube::RotateNeighborZ(bool ccw) {
+void Cube::RotateCubeUnitOverZ(bool ccw) {
     std::unordered_set<Cube*> visited;
     std::unordered_set<Cube*> next;
     next.insert(this);
@@ -242,7 +239,7 @@ void Cube::RotateNeighborZ(bool ccw) {
         storeUnvisitedCube(&center, next, visited);
     }
     // update all cubes to the new location
-    UpdateNeighborLocation();
+    UpdateCubeUnitLocation();
 }
 
 void storeUnvisitedCube(const Cube* cube, std::unordered_set<Cube*>& store, std::unordered_set<Cube*>& visited) {
@@ -252,6 +249,24 @@ void storeUnvisitedCube(const Cube* cube, std::unordered_set<Cube*>& store, std:
     if(cube->m_yNeg && visited.count(cube->m_yNeg) == 0) store.insert(cube->m_yNeg);
     if(cube->m_zPos && visited.count(cube->m_zPos) == 0) store.insert(cube->m_zPos);
     if(cube->m_zNeg && visited.count(cube->m_zNeg) == 0) store.insert(cube->m_zNeg);
+}
+
+std::string Cube::PrintCubeUnitLocationAsCSV() {
+    std::stringstream out;
+    for(Cube* c : GetCubeUnit()) {
+        out << c->m_xyz[0] << ',';
+        out << c->m_xyz[1] << ',';
+        out << c->m_xyz[2] << '\n';
+    }
+    return out.str();
+}
+
+void Cube::ExportCubeUnitLocationAsCSV(std::ofstream &file) {
+    for(Cube* c : GetCubeUnit()) {
+        file << c->m_xyz[0] << ',';
+        file << c->m_xyz[1] << ',';
+        file << c->m_xyz[2] << '\n';
+    }
 }
 
 std::string PrintLocationAsCSV(Cube** cubes, unsigned long size = 1) {
