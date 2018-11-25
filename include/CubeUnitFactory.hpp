@@ -45,11 +45,11 @@ public:
     // 1 1
     // 1 1
     // 1 1
-    Cube* ParseCubeUnit(std::stringstream &description, unsigned int id);
+    Cube* ParseCubeUnit(std::string &description, unsigned int id);
 private:
     // Constructor
     CubeUnitFactory();
-    std::vector<Cube*> m_CubeUnits;
+    std::vector<std::string> m_Descriptions;
     
 };
 #endif /* CubeUnitFactory_hpp */

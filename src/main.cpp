@@ -52,10 +52,14 @@ int main(int argc, const char * argv[]) {
     ExportLocationAsCSV(myCSV, &cubes[0], cubes.size());
     
     string description = "3 2 2 1 0 1 1 1 1 0 1 0 0 1 1";
-    stringstream ssDescription(description);
-    Cube *cubeUnit = CubeUnitFactory::instance().ParseCubeUnit(ssDescription, 1);
-    std::cout << cubeUnit->PrintCubeUnitLocationAsCSV();
+    Cube *cubeUnit = CubeUnitFactory::instance().ParseCubeUnit(description, 1);
+    
+    Cube *dupCubeUnit = cubeUnit->DuplicateCubeUnit();
+    dupCubeUnit->SetLocation(5, 5, 5);
+    dupCubeUnit->RotateCubeUnitOverX(false);
+    
     cubeUnit->ExportCubeUnitLocationAsCSV(myCSV);
+    dupCubeUnit->ExportCubeUnitLocationAsCSV(myCSV);
     
     
     myCSV.close();

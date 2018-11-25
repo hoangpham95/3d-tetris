@@ -11,14 +11,15 @@
 
 
 // This is not a very robust parser
-Cube* CubeUnitFactory::ParseCubeUnit(std::stringstream &description, unsigned int id) {
+Cube* CubeUnitFactory::ParseCubeUnit(std::string &description, unsigned int id) {
+    std::stringstream ssDescription(description);
     unsigned short x, y, z;
-    description >> x >> y >> z;
+    ssDescription >> x >> y >> z;
     bool cubeLocation[z][y][x];
     for(int i = 0; i < z; i++) {
         for(int j = 0; j < y; j++) {
             for(int k = 0; k < x; k++) {
-                description >> cubeLocation[i][j][k];
+                ssDescription >> cubeLocation[i][j][k];
             }
         }
     }
