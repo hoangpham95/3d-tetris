@@ -1,68 +1,19 @@
-//
-//  main.cpp
-//  CubesWorld
-//
-//  Created by Shanghao Zhong on 10/25/18.
-//  Copyright © 2018 Shanghao Zhong. All rights reserved.
-//
+// Support Code written by Michael D. Shah
+// Last Updated: 1/21/17
+// Please do not redistribute without asking permission.
 
+// Functionality that we created
+#include "SDLGraphicsProgram.h"
 #include <iostream>
-#include <vector>
-#include <fstream>
-#include <string>
-#include <sstream>
 
-#include "CubeUnitFactory.hpp"
+int main(int argc, char** argv){
 
-using namespace std;
-
-#include "Cube.hpp"
-
-int main(int argc, const char * argv[]) {
-    // create a csv for recording cubes location
-    ofstream myCSV;
-    // use std::ios::app as the second argument if don't want to overwrite
-    myCSV.open("./cubes.txt");
-    
-    // create cubes
-    vector<Cube*> cubes;
-    for(int i = 0; i < 5; i++) {
-        cubes.push_back(new Cube(i));
-    }
-    /*
-     0^
-     12y
-     34|
-     <z--+
-     */
-    JoinZ(cubes[4], cubes[3]);
-    JoinZ(cubes[2], cubes[1]);
-    JoinY(cubes[4], cubes[2]);
-    JoinY(cubes[3], cubes[1]);
-    JoinY(cubes[2], cubes[0]);
-    
-    cubes[0]->SetLocation(10,10,10);
-    cubes[0]->UpdateCubeUnitLocation();
-    ExportLocationAsCSV(myCSV, &cubes[0], cubes.size());
-    
-    cubes[0]->RotateCubeUnitOverX();
-    ExportLocationAsCSV(myCSV, &cubes[0], cubes.size());
-    
-    cubes[4]->RotateCubeUnitOverY();
-    ExportLocationAsCSV(myCSV, &cubes[0], cubes.size());
-    
-    string description = "3 2 2 1 0 1 1 1 1 0 1 0 0 1 1";
-    Cube *cubeUnit = CubeUnitFactory::instance().ParseCubeUnit(description, 1);
-    
-    Cube *dupCubeUnit = cubeUnit->DuplicateCubeUnit();
-    dupCubeUnit->SetLocation(5, 5, 5);
-    dupCubeUnit->RotateCubeUnitOverX(false);
-    
-    cubeUnit->ExportCubeUnitLocationAsCSV(myCSV);
-    dupCubeUnit->ExportCubeUnitLocationAsCSV(myCSV);
-    
-    
-    myCSV.close();
-    
-    return 0;
+	std::cout << "(main.cpp) Beginning Intitialization\n";
+	// Create an instance of an object for a SDLGraphicsProgram
+	SDLGraphicsProgram mySDLGraphicsProgram(1280,720);
+	// Run our program forever
+	mySDLGraphicsProgram.loop();
+	// When our program ends, it will exit scope, the
+	// destructor will then be called and clean up the program.
+	return 0;
 }
