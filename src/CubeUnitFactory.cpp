@@ -8,18 +8,22 @@
 
 #include "CubeUnitFactory.hpp"
 #include <sstream>
+#include <fstream>
+#include <ostream>
+#include <cassert>
+#include <random>
 
+using namespace std;
 
 // This is not a very robust parser
-Cube* CubeUnitFactory::ParseCubeUnit(std::string &description, unsigned int id) {
-    std::stringstream ssDescription(description);
+Cube* CubeUnitFactory::ParseCubeUnit(stringstream &description, unsigned int id) {
     unsigned short x, y, z;
-    ssDescription >> x >> y >> z;
+    description >> x >> y >> z;
     bool cubeLocation[z][y][x];
     for(int i = 0; i < z; i++) {
         for(int j = 0; j < y; j++) {
             for(int k = 0; k < x; k++) {
-                ssDescription >> cubeLocation[i][j][k];
+                description >> cubeLocation[i][j][k];
             }
         }
     }
@@ -62,6 +66,11 @@ Cube* CubeUnitFactory::ParseCubeUnit(std::string &description, unsigned int id) 
     return head;
 }
 
+Cube* CubeUnitFactory::ParseCubeUnit(string &description, unsigned int id) {
+    stringstream ssD(description);
+    return ParseCubeUnit(ssD, id);
+}
+
 CubeUnitFactory& CubeUnitFactory::instance() {
     static CubeUnitFactory* instance;
     if(!instance) {
@@ -72,4 +81,69 @@ CubeUnitFactory& CubeUnitFactory::instance() {
 
 CubeUnitFactory::CubeUnitFactory() {
     
+}
+
+void CubeUnitFactory::AddNewCubeUnits(string filepath) {
+    ifstream file(filepath);
+    
+    // check if the file can be opened
+    if(!file.is_open()) {
+        cout << "Unable to read Cube Units from file " << filepath << ".\n";
+        return;
+    }
+    
+    // the file can be opened
+    cout << "Using Cube Units from file " << filepath << ".\n";
+    
+    string line, word;
+    stringstream description;
+    unsigned int numD(0); // number of description
+    unsigned short x, y, z;
+    bool val;
+    while(file >> word) {
+        // opening of a description
+        if(word == "{") {
+            ++numD;
+            // getting dimension
+            file >> x >> y >> z;
+            description << x << ' ' << y << ' ' << z << ' ';
+            // checking the description is properly formatted
+            for(int i = 0; i < x * y * z; ++i) {
+                file >> val;
+                description << val << ' ';
+            }
+            // check if the description ends, as it should
+            file >> word;
+            if(word == "}") {
+                m_Descriptions.push_back(description.str());
+                description = stringstream();
+            } else {
+                cout << "Description error for description #" << numD << ". Abort reading from file " << filepath << ".\n";
+                break;
+            }
+        } else {
+            // skip the line that is not within curly braces
+            getline(file, line);
+        }
+    }
+    cout << numD << " Cube Unit descriptions have been added from " << filepath << ".\n";
+}
+
+unsigned int CubeUnitFactory::GetCubeUnitFactorySize() {
+    return m_Descriptions.size();
+}
+
+Cube* CubeUnitFactory::MakeCubeUnit(unsigned int index, unsigned int id) {
+    string description = m_Descriptions[index];
+    return ParseCubeUnit(description, id);
+}
+
+Cube* CubeUnitFactory::NewRandomCubeUnit() {
+    static random_device rd;
+    static mt19937_64 gen(rd());
+    uniform_int_distribution<> dis(0, m_Descriptions.size() - 1);
+    
+    static unsigned int id = 0;
+    
+    return MakeCubeUnit(dis(gen), id++);
 }
