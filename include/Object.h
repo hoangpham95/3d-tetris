@@ -24,28 +24,28 @@
 //
 //
 class Object {
- public:
-  // Object Constructor
-  Object();
-  // Object destructor
-  ~Object();
-  // Initialization routine
-  // The method can be overridden by other primitives.
-  virtual void init();
-  // How to draw the object
-  void render();
-  // Loads a specific texture
-  void LoadTexture(std::string fileName);
-
- protected:
-  // Helper method for when we are ready to draw or update our object
-  void Bind();
-  // For now we have one buffer per object.
-  Buffer myBuffer;
-  // For now we have one diffuse map and one normal map per object
-  Texture diffuseMap;
-  // Store the objects Geometry
-  Geometry geometry;
+public:
+    // Object Constructor
+    Object();
+    // Object destructor
+    ~Object();
+    // Initialization routine
+    // The method can be overridden by other primitives.
+    virtual void init();
+    // How to draw the object
+    virtual void render();
+    // Loads a specific texture
+    virtual void LoadTexture(std::string fileName);
+    
+protected:
+    // Helper method for when we are ready to draw or update our object
+    virtual void Bind();
+    // For now we have one buffer per object.
+    Buffer myBuffer;
+    // For now we have one diffuse map and one normal map per object
+    Texture diffuseMap;
+    // Store the objects Geometry
+    Geometry geometry;
 };
 
 #endif
