@@ -9,7 +9,12 @@
 #ifndef TetrisWorld_hpp
 #define TetrisWorld_hpp
 
+#if defined(LINUX) || defined(MINGW)
 #include <SDL2/SDL.h>
+#else  // This works for Mac
+#include <SDL.h>
+#endif
+
 #include <stdio.h>
 #include <iostream>
 #include <vector>
