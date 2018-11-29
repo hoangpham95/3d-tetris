@@ -11,11 +11,6 @@ SceneNode::SceneNode(Object* ob) {
   // then there is no parent.
   parent = nullptr;
 
-  // Setup shaders for the node.
-  std::string vertexShader = myShader.LoadShader("./shaders/vert.glsl");
-  std::string fragmentShader = myShader.LoadShader("./shaders/frag.glsl");
-  // Actually create our shader
-  myShader.CreateShader(vertexShader, fragmentShader);
 }
 
 // The destructor
@@ -24,6 +19,14 @@ SceneNode::~SceneNode() {
   for (unsigned int i = 0; i < children.size(); ++i) {
     delete children[i];
   }
+}
+
+void SceneNode::init() {
+    // Setup shaders for the node.
+    std::string vertexShader = myShader.LoadShader("./shaders/vert.glsl");
+    std::string fragmentShader = myShader.LoadShader("./shaders/frag.glsl");
+    // Actually create our shader
+    myShader.CreateShader(vertexShader, fragmentShader);
 }
 
 // Adds a child node to our current node.
