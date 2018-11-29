@@ -114,30 +114,36 @@ void SDLGraphicsProgram::loop() {
   // ================== Initialize the planets ===============
   static float rotate = 0.0f;
 
+    SceneNode* tmp;
   // Create Earth's Moon
   sphere3 = std::vector<Object*>(6, new Sphere());
   for (int i = 0; i < sphere3.size(); i++) {
-    Moon.push_back(new SceneNode(sphere3[i]));
+      tmp = new SceneNode(sphere3[i]);
+      tmp->init();
+    Moon.push_back(tmp);
   }
 
   // Create the Earth
   sphere2 = std::vector<Object*>(3, new Sphere());
   for (int i = 0; i < sphere2.size(); i++) {
-    Earth.push_back(new SceneNode(sphere2[i]));
+      tmp = new SceneNode(sphere2[i]);
+      tmp->init();
+    Earth.push_back(tmp);
   }
   // Create the Sun
   sphere = new Sphere();
   Sun = new SceneNode(sphere);
+    Sun->init();
 
   for (int i = 0; i < sphere3.size(); i++) {
-    sphere3[i]->LoadTexture("rock.ppm");
+    sphere3[i]->LoadTexture("./image/rock.ppm");
   }
 
   for (int i = 0; i < sphere2.size(); i++) {
-    sphere2[i]->LoadTexture("earth.ppm");
+    sphere2[i]->LoadTexture("./image/earth.ppm");
   }
 
-  sphere->LoadTexture("sun.ppm");
+  sphere->LoadTexture("./image/sun.ppm");
 
   // Render our scene starting from the sun.
   renderer->setRoot(Sun);
