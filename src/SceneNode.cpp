@@ -68,11 +68,6 @@ void SceneNode::Update(glm::mat4 projectionMatrix, Camera* camera) {
       worldTransform = localTransform;
     }
 
-    for (std::vector<SceneNode*>::iterator i = children.begin();
-         i != children.end(); i++) {
-      (*i)->Update(projectionMatrix, camera);
-    }
-
     // Now apply our shader transformation
     myShader.Bind();
     // Set the uniforms in our current shader

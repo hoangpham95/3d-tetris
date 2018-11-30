@@ -30,7 +30,7 @@ public:
     // all of the children within the node.
     // Now we do not have to manage deleting
     // each individual object.
-    ~SceneNode();
+    virtual ~SceneNode();
     // initialize the shader of this scenenode
     virtual void init();
     // Adds a child node to our current node.
@@ -46,14 +46,9 @@ public:
     Transform& getWorldTransform();
     // For now we have one shader per object.
     Shader myShader;
-    // TODO:
-    // Protected members are accessible by anything
-    // that we inherit from, as well as ?
 protected:
     // Parent
     SceneNode* parent;
-    
-private:
     // Children holds all a pointer to all of the descendents
     // of a particular SceneNode. A pointer is used because
     // we do not want to hold or make actual copies.
@@ -64,6 +59,7 @@ private:
     Transform localTransform;
     // We additionally can store the world transform
     Transform worldTransform;
+
 };
 
 #endif
