@@ -101,7 +101,14 @@ private:
     void DeleteBuffer();
     
     // Updates buffers with new cube data
-    void makeCubes(int numCubes, int* cubeLocations);
+    // numCubes: the number of cubes wanted to be added to buffer
+    // cubeLocations: the location of the center of each cube, its layout is
+    //   [x,y,z,x,y,z,...] where each x,y,z represents the coordinates of each cube.
+    //   Hence, the length of the array is 3*numCubes.
+    // cubeColors: the color of each cube, its layout is
+    //   [r,g,b,a,r,g,b,a,...] where each r,g,b,a represents the color of each cube.
+    //   Hence, the length of the array is 4*numCubes
+    void makeCubes(int numCubes, int* cubeLocations, float* cubeColors);
     
 };
 

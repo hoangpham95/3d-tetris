@@ -142,8 +142,10 @@ void SDLGraphicsProgram::GenerateBuffers(){
     glGenBuffers(1, &vertexPositionBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexPositionBuffer);
     // vertex attribute
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0); // position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7*sizeof(GLfloat), 0);
+    glEnableVertexAttribArray(1); // color
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
     // index buffer
     glGenBuffers(1, &indexBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
@@ -164,17 +166,30 @@ void SDLGraphicsProgram::update()
     static int x = 0;
     int locations[21] = {0,0,0, x,0,0, 0,0,x, 0,0,6, 6,0,0, 6,0,6, 3,1,3};
     x = (x + 1)%5;
-    makeCubes(7, locations);
+    float colors[28] = {
+        1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.5f,
+    };
+    makeCubes(7, locations, colors);
     
 }
 
-void SDLGraphicsProgram::makeCubes(int numCubes, int *cubeLocations) {
-    GLfloat vertexBufferData[3 * 8 * numCubes];
+void SDLGraphicsProgram::makeCubes(int numCubes, int *cubeLocations, float *cubeColors) {
+    GLfloat vertexBufferData[7 * 8 * numCubes];
     for(int i = 0; i < numCubes; ++i) {
         for(int j = 0; j < 8; ++j) {
-            vertexBufferData[3 * (8 * i + j)] = m_singleCubeVertice[3 * j] + m_cubeDistance * cubeLocations[3 * i];
-            vertexBufferData[3 * (8 * i + j) + 1] = m_singleCubeVertice[3 * j + 1] + m_cubeDistance * cubeLocations[3 * i + 1];
-            vertexBufferData[3 * (8 * i + j) + 2] = m_singleCubeVertice[3 * j + 2] + m_cubeDistance * cubeLocations[3 * i + 2];
+            vertexBufferData[7*(8*i+j)] = m_singleCubeVertice[3*j] + m_cubeDistance * cubeLocations[3*i];
+            vertexBufferData[7*(8*i+j)+1] = m_singleCubeVertice[3*j+1] + m_cubeDistance * cubeLocations[3*i+1];
+            vertexBufferData[7*(8*i+j)+2] = m_singleCubeVertice[3*j+2] + m_cubeDistance * cubeLocations[3*i+2];
+            vertexBufferData[7*(8*i+j)+3] = cubeColors[4*i];
+            vertexBufferData[7*(8*i+j)+4] = cubeColors[4*i+1];
+            vertexBufferData[7*(8*i+j)+5] = cubeColors[4*i+2];
+            vertexBufferData[7*(8*i+j)+6] = cubeColors[4*i+3];
         }
     }
     GLuint indexBuffereData[3 * 12 * numCubes];
@@ -260,12 +275,11 @@ void SDLGraphicsProgram::loop(){
                 case SDL_KEYDOWN:
                     HandleKeyDown(quit, &e.key);
                     break;
-                case SDL_MOUSEBUTTONDOWN:
-                    isKeyDown = true;
-                    break;
                 case SDL_MOUSEBUTTONUP:
                     isKeyDown = false;
                     break;
+                case SDL_MOUSEBUTTONDOWN:
+                    isKeyDown = true;
                 case SDL_MOUSEMOTION:
                     if(isKeyDown) {
                         rotate = (float)e.motion.x/screenWidth * 10;
