@@ -81,6 +81,7 @@ SDLGraphicsProgram::SDLGraphicsProgram(int w, int h):screenWidth(w),screenHeight
         halfWidth, halfWidth, -halfWidth,
         halfWidth, halfWidth, halfWidth,
     };
+    m_singleCubeVertexNum = 8;
     m_singleCubeIndices = new GLshort[36] {
         0, 4, 1,
         1, 2, 0,
@@ -95,7 +96,7 @@ SDLGraphicsProgram::SDLGraphicsProgram(int w, int h):screenWidth(w),screenHeight
         6, 4, 2,
         6, 7, 4,
     };
-    
+    m_singleCubeIndexNum = 36;
 }
 
 
@@ -180,22 +181,32 @@ void SDLGraphicsProgram::update()
 }
 
 void SDLGraphicsProgram::makeCubes(int numCubes, int *cubeLocations, float *cubeColors) {
-    GLfloat vertexBufferData[7 * 8 * numCubes];
+    GLfloat vertexBufferData[7 * m_singleCubeVertexNum * numCubes];
     for(int i = 0; i < numCubes; ++i) {
-        for(int j = 0; j < 8; ++j) {
-            vertexBufferData[7*(8*i+j)] = m_singleCubeVertice[3*j] + m_cubeDistance * cubeLocations[3*i];
-            vertexBufferData[7*(8*i+j)+1] = m_singleCubeVertice[3*j+1] + m_cubeDistance * cubeLocations[3*i+1];
-            vertexBufferData[7*(8*i+j)+2] = m_singleCubeVertice[3*j+2] + m_cubeDistance * cubeLocations[3*i+2];
-            vertexBufferData[7*(8*i+j)+3] = cubeColors[4*i];
-            vertexBufferData[7*(8*i+j)+4] = cubeColors[4*i+1];
-            vertexBufferData[7*(8*i+j)+5] = cubeColors[4*i+2];
-            vertexBufferData[7*(8*i+j)+6] = cubeColors[4*i+3];
+        for(int j = 0; j < m_singleCubeVertexNum; ++j) {
+            // location x
+            vertexBufferData[7*(m_singleCubeVertexNum*i+j)]
+            = m_singleCubeVertice[3*j] + m_cubeDistance * cubeLocations[3*i];
+            // location y
+            vertexBufferData[7*(m_singleCubeVertexNum*i+j)+1]
+            = m_singleCubeVertice[3*j+1] + m_cubeDistance * cubeLocations[3*i+1];
+            // location z
+            vertexBufferData[7*(m_singleCubeVertexNum*i+j)+2]
+            = m_singleCubeVertice[3*j+2] + m_cubeDistance * cubeLocations[3*i+2];
+            // color r
+            vertexBufferData[7*(m_singleCubeVertexNum*i+j)+3] = cubeColors[4*i];
+            // color g
+            vertexBufferData[7*(m_singleCubeVertexNum*i+j)+4] = cubeColors[4*i+1];
+            // color b
+            vertexBufferData[7*(m_singleCubeVertexNum*i+j)+5] = cubeColors[4*i+2];
+            // color a
+            vertexBufferData[7*(m_singleCubeVertexNum*i+j)+6] = cubeColors[4*i+3];
         }
     }
-    GLuint indexBuffereData[3 * 12 * numCubes];
+    GLuint indexBuffereData[m_singleCubeIndexNum * numCubes];
     for(int i = 0; i < numCubes; ++i) {
-        for(int j = 0; j < 36; ++j) {
-            indexBuffereData[36 * i + j] = m_singleCubeIndices[j] + 8 * i;
+        for(int j = 0; j < m_singleCubeIndexNum; ++j) {
+            indexBuffereData[m_singleCubeIndexNum * i + j] = m_singleCubeIndices[j] + m_singleCubeVertexNum * i;
         }
     }
     

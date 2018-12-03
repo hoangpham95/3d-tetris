@@ -75,6 +75,8 @@ private:
     // (0,0,0) with length m_cubeWidth;
     GLfloat *m_singleCubeVertice;
     GLshort *m_singleCubeIndices;
+    unsigned short m_singleCubeVertexNum;
+    unsigned short m_singleCubeIndexNum;
     
     // User interaction
     void HandleKeyDown(bool &quit, SDL_KeyboardEvent *pe);
