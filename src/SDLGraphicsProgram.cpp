@@ -164,32 +164,8 @@ void SDLGraphicsProgram::update()
     static int x = 0;
     int locations[21] = {0,0,0, x,0,0, 0,0,x, 0,0,6, 6,0,0, 6,0,6, 3,1,3};
     x = (x + 1)%5;
-    static float rotate = 0.0f;
     makeCubes(7, locations);
     
-    // MVP matrices
-    glm::mat4 projection = glm::perspective(45.0f,((float)screenWidth)/((float)screenHeight),0.1f,20.0f);
-    
-    glm::mat4 model = glm::mat4(1.0f);
-    // the first translate is for pushing the entire tetris world back
-    model = glm::translate(model, glm::vec3(-0.0f, -0.0f, -10.0f));
-    // the rotate is for rotating the tetris itself
-    model = glm::rotate(model, rotate, glm::vec3(0.0f, 1.0f, 0.0f));
-    // the second translate is to offset the center of the tetris world from (3,0,3) to (0,0,0)
-    model = glm::translate(model, glm::vec3(-3.0f, 0.0f, -3.0f));
-    rotate = rotate + 0.05f;
-    
-    glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),
-                                 glm::vec3(0.0f, 0.0f, -1.0f),
-                                 glm::vec3(0.0f, 1.0f, 0.0f));
-    
-    GLint modelUniformLocation = glGetUniformLocation(shader, "model");
-    GLint viewUniformLocation = glGetUniformLocation(shader, "view");
-    GLint projectionUniformLocation = glGetUniformLocation(shader, "projection");
-    
-    glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, &model[0][0]);
-    glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, &view[0][0]);
-    glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, &projection[0][0]);
 }
 
 void SDLGraphicsProgram::makeCubes(int numCubes, int *cubeLocations) {
@@ -247,6 +223,32 @@ void SDLGraphicsProgram::loop(){
     SDL_StartTextInput();
     // While application is running
     while(!quit){
+        
+        static float rotate = 0.0f;
+        // MVP matrices
+        glm::mat4 projection = glm::perspective(45.0f,((float)screenWidth)/((float)screenHeight),0.1f,20.0f);
+        
+        glm::mat4 model = glm::mat4(1.0f);
+        // the first translate is for pushing the entire tetris world back
+        model = glm::translate(model, glm::vec3(-0.0f, -5.0f, -15.0f));
+        // the rotate is for rotating the tetris itself
+        model = glm::rotate(model, rotate, glm::vec3(0.0f, 1.0f, 0.0f));
+        // the second translate is to offset the center of the tetris world from (3,0,3) to (0,0,0)
+        model = glm::translate(model, glm::vec3(-3.0f, 0.0f, -3.0f));
+        
+        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),
+                                     glm::vec3(0.0f, 0.0f, -1.0f),
+                                     glm::vec3(0.0f, 1.0f, 0.0f));
+        
+        GLint modelUniformLocation = glGetUniformLocation(shader, "model");
+        GLint viewUniformLocation = glGetUniformLocation(shader, "view");
+        GLint projectionUniformLocation = glGetUniformLocation(shader, "projection");
+        
+        glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, &model[0][0]);
+        glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, &view[0][0]);
+        glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, &projection[0][0]);
+        
+        static bool isKeyDown(false);
         //Handle events on queue
         while(SDL_PollEvent( &e ) != 0){
             // User posts an event to quit
@@ -257,6 +259,17 @@ void SDLGraphicsProgram::loop(){
                     break;
                 case SDL_KEYDOWN:
                     HandleKeyDown(quit, &e.key);
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    isKeyDown = true;
+                    break;
+                case SDL_MOUSEBUTTONUP:
+                    isKeyDown = false;
+                    break;
+                case SDL_MOUSEMOTION:
+                    if(isKeyDown) {
+                        rotate = (float)e.motion.x/screenWidth * 10;
+                    }
                     break;
                 default:
                     break;
@@ -269,7 +282,7 @@ void SDLGraphicsProgram::loop(){
         render();
         //Update screen of our specified window
         SDL_GL_SwapWindow(getSDLWindow());
-        SDL_Delay(100);
+        SDL_Delay(25);
     }
     
     //Disable text input
@@ -405,7 +418,7 @@ void SDLGraphicsProgram::getOpenGLVersionInfo(){
 }
 
 
-// handel key down event
+// handle key down event
 void SDLGraphicsProgram::HandleKeyDown(bool &quit, SDL_KeyboardEvent *pe) {
     switch (pe->keysym.sym) {
         case SDLK_w: // pressed 2
@@ -418,5 +431,6 @@ void SDLGraphicsProgram::HandleKeyDown(bool &quit, SDL_KeyboardEvent *pe) {
         default:
             break;
     }
-    
 }
+
+// handle mouse drag event
