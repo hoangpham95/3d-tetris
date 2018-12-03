@@ -80,7 +80,7 @@ CubeUnitFactory& CubeUnitFactory::instance() {
 }
 
 CubeUnitFactory::CubeUnitFactory() {
-    
+    AddNewCubeUnits("./other/cubes.txt");
 }
 
 void CubeUnitFactory::AddNewCubeUnits(string filepath) {

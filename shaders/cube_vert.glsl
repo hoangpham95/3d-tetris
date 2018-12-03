@@ -1,19 +1,27 @@
+// ==================================================================
 #version 330 core
 
-// the position of the vertex
-layout(location=0)in vec3 position;
-// the color of the cube
-uniform vec4 color;
+layout(location=0)in vec3 position; // We explicitly state which is the vertex information (The first 3 floats are positional data, we are putting in our vector)
+layout(location=1)in vec3 vertexColor; // Our second attribute which is the color.
 
-uniform mat4 model; // Object space
-uniform mat4 view; // Object space
-uniform mat4 projection; // Object space
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
-out vec3 FragPos;
+// Do not forget this!
+out vec3 theColor;
 
-void main() {
-    
+void main()
+{
+    // gl_Position is a special glsl variable that tells us what
+    // postiion to put things in.
+    // It takes in exactly 4 things.
+    // Note that 'w' (the 4th dimension) should be 1.
     gl_Position = projection * view * model * vec4(position, 1.0f);
     
-    FragPos = vec3(model* vec4(position,1.0f));
+    // Store the vertex color that we take in as what we will output
+    // to the next stage in the graphics pipeline.
+    theColor = vertexColor;
+    
 }
+// ==================================================================

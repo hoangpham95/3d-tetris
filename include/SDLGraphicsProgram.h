@@ -1,57 +1,108 @@
-/** @file SDLGraphicsProgram.h
- *  @brief SDL Class used to setup input and setup of OpenGL.
- *
- *  This class is used for the initialization of SDL.
- *
- *  @author Mike
- *  @bug No known bugs.
- */
+// SDLGraphicsProgram
+// This class is used to handel SDL windows and the OpenGL program within it
+// The structure of this class is inspired by Mike Shah, instructor of CS4300
+// The implementation is made suitable for rendering 3d-tetris
+//
+// Author: Mike Shah, Shanghao Zhong
 
 #ifndef SDLGRAPHICSPROGRAM
 #define SDLGRAPHICSPROGRAM
 
-// ==================== Libraries ==================
-// Depending on the operating system we use
-// The paths to SDL are actually different.
-// The #define statement should be passed in
-// when compiling using the -D argument.
-// This gives an example of how a programmer
-// may support multiple platforms with different
-// dependencies.
 #if defined(LINUX) || defined(MINGW)
 #include <SDL2/SDL.h>
 #else  // This works for Mac
 #include <SDL.h>
 #endif
 
-#include <vector>
-#include "Renderer.h"
-// Purpose:
-// This class sets up a full graphics program using SDL
-//
-//
-//
-class SDLGraphicsProgram {
- public:
-  // Constructor
-  SDLGraphicsProgram(int w, int h);
-  // Desctructor
-  ~SDLGraphicsProgram();
-  // loop that runs forever
-  void loop();
-  // Get Pointer to Window
-  SDL_Window* getSDLWindow();
-  // Helper Function to Query OpenGL information.
-  void getOpenGLVersionInfo();
+// The glad library helps setup OpenGL extensions.
+#include <glad/glad.h>
 
- private:
-  // The window we'll be rendering to
-  SDL_Window* gWindow;
-  // OpenGL context
-  SDL_GLContext gContext;
-  // The Renderer responsible for drawing objects
-  // in OpenGL (Or whatever Renderer you choose!)
-  Renderer* renderer;
+// glm for handling model, view, projection matrices
+#include "glm/vec3.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
+// std library
+#include <iostream>
+
+
+class SDLGraphicsProgram{
+public:
+    // Constructor
+    // It takes in the demensions of the windows
+    // It will initialized SDL, OpenGL, and other relevent data
+    SDLGraphicsProgram(int w, int h);
+    // Desctructor
+    ~SDLGraphicsProgram();
+    // Per frame update
+    void update();
+    // Renders shapes to the screen
+    void render();
+    // loop that runs forever
+    void loop();
+    // Get Pointer to Window
+    SDL_Window* getSDLWindow();
+    // Shader loading utility programs
+    void printProgramLog( GLuint program );
+    void printShaderLog( GLuint shader );
+    // Helper Function to Query OpenGL information.
+    void getOpenGLVersionInfo();
+    
+private:
+    // Screen dimension constants
+    int screenHeight;
+    int screenWidth;
+    // The window we'll be rendering to
+    SDL_Window* gWindow ;
+    // OpenGL context
+    SDL_GLContext gContext;
+    // For now, we can have one shader.
+    unsigned int shader;
+    // Vertex Array Object
+    GLuint VAOId;
+    // Vertex Buffer
+    GLuint vertexPositionBuffer;
+    // Index Buffer Object
+    GLuint indexBufferObject;
+    // number of indices
+    unsigned int m_numIdx;
+    // bool indicated if the graph is filled or outlined
+    bool m_isFilled{true};
+    // the distance between two cubes that are single unit apart
+    const GLfloat m_cubeDistance{1.0f};
+    // the width of each cube
+    const GLfloat m_cubeWidth{0.8};
+    // the vertex positions and indices used to draw a single cube centered at
+    // (0,0,0) with length m_cubeWidth;
+    GLfloat *m_singleCubeVertice;
+    GLshort *m_singleCubeIndices;
+    
+    // User interaction
+    void HandleKeyDown(bool &quit, SDL_KeyboardEvent *pe);
+    void HanleMouseDrag(SDL_MouseMotionEvent *me);
+    
+    // Setting up OpenGL
+    // It wills load shaders and compile shaders
+    // Returns true if successful, false otherwise
+    bool initGL();
+    // Shader helpers
+    // loads shadders files as a string
+    std::string LoadShader(const std::string& fname);
+    // creates shaders program
+    unsigned int CreateShader(const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
+    // compiles shaders
+    unsigned int CompileShader(unsigned int type, const std::string& source);
+    // tests link status
+    bool CheckLinkStatus(GLuint programID);
+    
+    // Handling Buffer
+    // Generate any vertex buffers
+    void GenerateBuffers();
+    // delete buffer
+    void DeleteBuffer();
+    
+    // Updates buffers with new cube data
+    void makeCubes(int numCubes, int* cubeLocations);
+    
 };
 
 #endif
