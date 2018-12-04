@@ -18,12 +18,18 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <map>
+#include <algorithm>
+#include <limits>
 #include "Cube.hpp"
 
 class TetrisWorld {
  public:
-  enum Direction { D_UP, D_DOWN, D_LEFT, D_RIGHT, D_FRONT, D_BACK, D_NONE };
-  enum Rotation { R_UP, R_DOWN, R_LEFT, R_RIGHT, R_FRONT, R_BACK, R_NONE };
+  enum Direction { D_DOWN, D_LEFT, D_RIGHT };
+  enum Rotation { R_NONE, R_LEFT, R_RIGHT };
+
+  TetrisWorld(unsigned int, unsigned int, unsigned int);
+  ~TetrisWorld();
 
   void Update(Direction, Rotation);
   void init();
@@ -31,13 +37,19 @@ class TetrisWorld {
   void isEndGame();
 
  private:
+  unsigned int board_x, board_y, board_z;
+  unsigned int points{0};
+
   void genNextFigure();
   std::vector<Cube*> m_CurrentMovingCubes;
   std::vector<Cube*> m_Cubes;
-  int points{0};
+  bool isGameOver;
+
   bool isColliding();
   void merge();     // if colliding, merge current moving cubes to all cubes
-  bool collapse();  // action when 1 surface has been filled
+  void collapse();  // action when 1 surface has been filled 
+  void move(Direction);
+  void rotate(Rotation);
 };
 
 #endif /* TetrisWorld_hpp */

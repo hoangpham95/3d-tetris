@@ -167,6 +167,7 @@ void SDLGraphicsProgram::update()
     static int x = 0;
     int locations[21] = {0,0,0, x,0,0, 0,0,x, 0,0,6, 6,0,0, 6,0,6, 3,1,3};
     x = (x + 1)%5;
+
     float colors[28] = {
         1.0f, 1.0f, 1.0f, 1.0f,
         1.0f, 1.0f, 1.0f, 1.0f,
@@ -177,7 +178,7 @@ void SDLGraphicsProgram::update()
         1.0f, 0.0f, 1.0f, 0.5f,
     };
     makeCubes(7, locations, colors);
-    
+
 }
 
 void SDLGraphicsProgram::makeCubes(int numCubes, int *cubeLocations, float *cubeColors) {
