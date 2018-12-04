@@ -33,7 +33,7 @@ public:
     // set color
     void SetColor(float r, float g, float b, float a = 1.0f);
     // get location
-    inline int* const GetLocation() {return m_xyz;};
+    int m_x, m_y, m_z;
     // set location
     void SetLocation(int x, int y, int z);
     // return the neighboring cubes
@@ -82,8 +82,6 @@ private:
     Cube* m_zPos{nullptr};
     // colors
     float m_rgba[4]{1.0f, 1.0f, 1.0f, 1.0f};
-    // locations
-    int m_xyz[3]{0,0,0};
     // push all the neighboring Cube into a given queue, if the Cube is not in the visited set
     friend void storeUnvisitedCube(const Cube* cube, std::unordered_set<Cube*>& store, std::unordered_set<Cube*>& visited);
 };

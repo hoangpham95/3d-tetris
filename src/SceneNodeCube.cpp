@@ -28,9 +28,9 @@ void SceneNodeCube::Update(glm::mat4 projectionMatrix, Camera *camera) {
     
     // set location tranformation based on m_cube
     localTransform.loadIdentity();
-    localTransform.translate(m_cube->GetLocation()[0],
-                             m_cube->GetLocation()[1],
-                             m_cube->GetLocation()[2]);
+    localTransform.translate(m_cube->m_x,
+                             m_cube->m_y,
+                             m_cube->m_z);
     
     // set world transformation
     if(parent) { // if there is a parent node

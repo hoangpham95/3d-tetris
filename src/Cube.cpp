@@ -52,7 +52,7 @@ void JoinZ(Cube* zNeg, Cube* zPos) {
 
 std::ostream& operator<<(std::ostream& out, const Cube& cube) {
     out << "Cube(id:" << cube.m_id;
-    out << "|xyz:" << cube.m_xyz[0] << "," << cube.m_xyz[1] << "," << cube.m_xyz[2] << ")";
+    out << "|xyz:" << cube.m_x << "," << cube.m_y << "," << cube.m_z << ")";
     return out;
 }
 
@@ -73,9 +73,9 @@ void Cube::SetColor(float r, float g, float b, float a) {
 }
 
 void Cube::SetLocation(int x, int y, int z) {
-    m_xyz[0] = x;
-    m_xyz[1] = y;
-    m_xyz[2] = z;
+    m_x = x;
+    m_y = y;
+    m_z = z;
 }
 
 std::vector<Cube*>& Cube::GetCubeUnit() {
@@ -130,9 +130,9 @@ void Cube::UpdateCubeUnitLocation() {
         next.erase(&wkc);
         visited.insert(&wkc);
         // record the location
-        int x = wkc.m_xyz[0];
-        int y = wkc.m_xyz[1];
-        int z = wkc.m_xyz[2];
+        int x = wkc.m_x;
+        int y = wkc.m_y;
+        int z = wkc.m_z;
         // update each of the unvisited neighboring cubes
         if(wkc.m_xNeg && visited.count(wkc.m_xNeg) == 0) {
             wkc.m_xNeg->SetLocation(x - 1, y, z);
@@ -255,36 +255,36 @@ void storeUnvisitedCube(const Cube* cube, std::unordered_set<Cube*>& store, std:
 std::string Cube::PrintCubeUnitLocationAsCSV() {
     std::stringstream out;
     for(Cube* c : GetCubeUnit()) {
-        out << c->m_xyz[0] << ',';
-        out << c->m_xyz[1] << ',';
-        out << c->m_xyz[2] << '\n';
+        out << c->m_x << ',';
+        out << c->m_y << ',';
+        out << c->m_z << '\n';
     }
     return out.str();
 }
 
 void Cube::ExportCubeUnitLocationAsCSV(std::ofstream &file) {
     for(Cube* c : GetCubeUnit()) {
-        file << c->m_xyz[0] << ',';
-        file << c->m_xyz[1] << ',';
-        file << c->m_xyz[2] << '\n';
+        file << c->m_x << ',';
+        file << c->m_y << ',';
+        file << c->m_z << '\n';
     }
 }
 
 std::string PrintLocationAsCSV(Cube** cubes, unsigned long size = 1) {
     std::stringstream out;
     for(int i = 0; i < size; i++) {
-        out << cubes[i]->m_xyz[0] << ',';
-        out << cubes[i]->m_xyz[1] << ',';
-        out << cubes[i]->m_xyz[2] << '\n';
+        out << cubes[i]->m_x << ',';
+        out << cubes[i]->m_y << ',';
+        out << cubes[i]->m_z << '\n';
     }
     return out.str();
 }
 
 void ExportLocationAsCSV(std::ofstream& file, Cube** cubes, unsigned long size = 1) {
     for(int i = 0; i < size; i++) {
-        file << cubes[i]->m_xyz[0] << ',';
-        file << cubes[i]->m_xyz[1] << ',';
-        file << cubes[i]->m_xyz[2] << std::endl;
+        file << cubes[i]->m_x << ',';
+        file << cubes[i]->m_y << ',';
+        file << cubes[i]->m_z << std::endl;
     }
 }
 
@@ -292,9 +292,9 @@ Cube::Cube(const Cube& cube) : m_id(cube.m_id) {
     for(int i = 0; i < 4; ++i) {
         m_rgba[i] = cube.m_rgba[i];
     }
-    for(int i = 0; i < 3; ++i) {
-        m_xyz[i] = cube.m_xyz[i];
-    }
+    m_x = cube.m_x;
+    m_y = cube.m_y;
+    m_z = cube.m_z;
 }
 
 Cube* Cube::DuplicateCubeUnit() {
