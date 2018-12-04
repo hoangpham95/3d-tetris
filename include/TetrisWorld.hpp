@@ -15,41 +15,38 @@
 #include <SDL.h>
 #endif
 
+#include <Constants.h>
+#include <Tetromino.h>
 #include <stdio.h>
+#include <Cube.hpp>
+#include <algorithm>
+#include <climits>
 #include <iostream>
 #include <vector>
-#include <map>
-#include <algorithm>
-#include <limits>
-#include "Cube.hpp"
 
 class TetrisWorld {
  public:
-  enum Direction { D_DOWN, D_LEFT, D_RIGHT };
-  enum Rotation { R_NONE, R_LEFT, R_RIGHT };
-
   TetrisWorld(unsigned int, unsigned int, unsigned int);
   ~TetrisWorld();
 
   void Update(Direction, Rotation);
-  void init();
-  void getPoints();
-  void isEndGame();
+  int GetPoints();
+  bool IsEndGame();
 
  private:
   unsigned int board_x, board_y, board_z;
   unsigned int points{0};
 
-  void genNextFigure();
-  std::vector<Cube*> m_CurrentMovingCubes;
+  void GenNextFigure();
+  Tetromino* m_CurrentMovingCubes;
   std::vector<Cube*> m_Cubes;
   bool isGameOver;
 
-  bool isColliding();
-  void merge();     // if colliding, merge current moving cubes to all cubes
-  void collapse();  // action when 1 surface has been filled 
-  void move(Direction);
-  void rotate(Rotation);
+  bool IsColliding();
+  void Merge();     // if colliding, merge current moving cubes to all cubes
+  bool Collapse();  // action when 1 surface has been filled
+  void Move(Direction);
+  void Rotate(Rotation);
 };
 
 #endif /* TetrisWorld_hpp */
