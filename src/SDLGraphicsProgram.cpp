@@ -165,7 +165,6 @@ void SDLGraphicsProgram::update()
     int locations[21] = {0,0,0, x,0,0, 0,0,x, 0,0,6, 6,0,0, 6,0,6, 3,1,3};
     x = (x + 1)%5;
     makeCubes(7, locations);
-    
 }
 
 void SDLGraphicsProgram::makeCubes(int numCubes, int *cubeLocations) {
