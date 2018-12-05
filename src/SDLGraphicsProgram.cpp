@@ -166,7 +166,7 @@ void SDLGraphicsProgram::update() {
   for (int i = 0; i < cubes.size(); i++) {
     float* cubeColor = cubes[i]->GetColor();
     for (int j = 0; j < 4; j++) {
-      cubeCols.push_back(0.5f);
+      cubeCols.push_back(cubeColor[j]);
     }
   }
   makeCubes(cubes.size(), cubeLocs, cubeCols);
@@ -315,6 +315,12 @@ void SDLGraphicsProgram::loop() {
       // An example is hitting the "x" in the corner of the window.
       switch (e.type) {
         case SDL_QUIT:
+          std::cout << "==================================================="
+                    << std::endl;
+          std::cout << "YOU GAINED: " << tetris.GetPoints() << " points!"
+                    << std::endl;
+          std::cout << "==================================================="
+                    << std::endl;
           quit = true;
           break;
         case SDL_KEYDOWN:

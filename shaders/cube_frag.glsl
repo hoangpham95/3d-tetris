@@ -12,9 +12,11 @@ out vec4 color;
 void main()
 {
     bvec3 surface = equal(vec3(cubeHalfsize, cubeHalfsize, cubeHalfsize), abs(OriginPosition));
+    
     float r = 0;
     float g = 0;
     float b = 0;
+
     if(surface.x) {
         r = 1;
     }
@@ -28,6 +30,6 @@ void main()
     // shader, we are expecting in our pipeline a color output.
     // That is essentially the job of the fragment shader!
 //    color = FragColor;
-    color = vec4(r,g,b,1);
+    color = FragColor;
 }
 
