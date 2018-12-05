@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 
+#define PI 3.1415926535f
+
 SDLGraphicsProgram::SDLGraphicsProgram(int w, int h, TetrisWorld tetris)
     : screenWidth(w), screenHeight(h), tetris(tetris) {
   // Initialization flag
@@ -120,6 +122,7 @@ bool SDLGraphicsProgram::initGL() {
 }
 
 void SDLGraphicsProgram::GenerateBuffers() {
+  m_stride = 10;
   // VertexArrays
   glGenVertexArrays(1, &VAOId);
   glBindVertexArray(VAOId);
@@ -128,10 +131,14 @@ void SDLGraphicsProgram::GenerateBuffers() {
   glBindBuffer(GL_ARRAY_BUFFER, vertexPositionBuffer);
   // vertex attribute
   glEnableVertexAttribArray(0);  // position
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, m_stride * sizeof(GLfloat),
+                        0);
   glEnableVertexAttribArray(1);  // color
-  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat),
+  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, m_stride * sizeof(GLfloat),
                         (void*)(3 * sizeof(GLfloat)));
+  glEnableVertexAttribArray(2);  // position
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, m_stride * sizeof(GLfloat),
+                        (void*)(7 * sizeof(GLfloat)));
   // index buffer
   glGenBuffers(1, &indexBufferObject);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
@@ -165,39 +172,53 @@ void SDLGraphicsProgram::update() {
   makeCubes(cubes.size(), cubeLocs, cubeCols);
 
   // finishing rendering, reset back to old move
-  m_Direction = D_DOWN;
+  m_Direction = D_NONE;
   m_Rotation = R_NONE;
+  // if the timer reaches the time speed, move down 1 unit
+  if (m_timer >= m_gameSpeed) {
+    tetris.Update(D_DOWN, R_NONE);
+    m_timer = 0;
+  }
 }
 
 void SDLGraphicsProgram::makeCubes(int numCubes,
                                    std::vector<float> cubeLocations,
                                    std::vector<float> cubeColors) {
-  GLfloat vertexBufferData[7 * m_singleCubeVertexNum * numCubes];
+  GLfloat vertexBufferData[m_stride * m_singleCubeVertexNum * numCubes];
   for (int i = 0; i < numCubes; ++i) {
     for (int j = 0; j < m_singleCubeVertexNum; ++j) {
       // location x
-      vertexBufferData[7 * (m_singleCubeVertexNum * i + j)] =
+      vertexBufferData[m_stride * (m_singleCubeVertexNum * i + j)] =
           m_singleCubeVertice[3 * j] + m_cubeDistance * cubeLocations[3 * i];
       // location y
-      vertexBufferData[7 * (m_singleCubeVertexNum * i + j) + 1] =
+      vertexBufferData[m_stride * (m_singleCubeVertexNum * i + j) + 1] =
           m_singleCubeVertice[3 * j + 1] +
           m_cubeDistance * cubeLocations[3 * i + 1];
       // location z
-      vertexBufferData[7 * (m_singleCubeVertexNum * i + j) + 2] =
+      vertexBufferData[m_stride * (m_singleCubeVertexNum * i + j) + 2] =
           m_singleCubeVertice[3 * j + 2] +
           m_cubeDistance * cubeLocations[3 * i + 2];
       // color r
-      vertexBufferData[7 * (m_singleCubeVertexNum * i + j) + 3] =
+      vertexBufferData[m_stride * (m_singleCubeVertexNum * i + j) + 3] =
           cubeColors[4 * i];
       // color g
-      vertexBufferData[7 * (m_singleCubeVertexNum * i + j) + 4] =
+      vertexBufferData[m_stride * (m_singleCubeVertexNum * i + j) + 4] =
           cubeColors[4 * i + 1];
       // color b
-      vertexBufferData[7 * (m_singleCubeVertexNum * i + j) + 5] =
+      vertexBufferData[m_stride * (m_singleCubeVertexNum * i + j) + 5] =
           cubeColors[4 * i + 2];
       // color a
-      vertexBufferData[7 * (m_singleCubeVertexNum * i + j) + 6] =
+      vertexBufferData[m_stride * (m_singleCubeVertexNum * i + j) + 6] =
           cubeColors[4 * i + 3];
+      // origin position x
+      vertexBufferData[m_stride * (m_singleCubeVertexNum * i + j) + 7] =
+          m_singleCubeVertice[3 * j];
+      // origin position y
+      vertexBufferData[m_stride * (m_singleCubeVertexNum * i + j) + 8] =
+          m_singleCubeVertice[3 * j + 1];
+      // origin position z
+      vertexBufferData[m_stride * (m_singleCubeVertexNum * i + j) + 9] =
+          m_singleCubeVertice[3 * j + 2];
     }
   }
   GLuint indexBufferData[m_singleCubeIndexNum * numCubes];
@@ -208,12 +229,16 @@ void SDLGraphicsProgram::makeCubes(int numCubes,
     }
   }
 
+  GLint cubeHalfsizeUniformLocation =
+      glGetUniformLocation(shader, "cubeHalfsize");
+  glUniform1f(cubeHalfsizeUniformLocation, m_cubeWidth / 2.0f);
+
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBufferData), vertexBufferData,
                GL_STATIC_DRAW);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexBufferData),
                indexBufferData, GL_STATIC_DRAW);
 
-  m_numIdx = 3 * 12 * numCubes;
+  m_numIdx = m_singleCubeIndexNum * numCubes;
 }
 
 // Render
@@ -223,6 +248,7 @@ void SDLGraphicsProgram::render() {
   // This is the background of the screen.
   glViewport(0, 0, screenWidth, screenHeight);
   glClearColor(0.8f, 0.8f, 0.8f, 1.f);
+  glEnable(GL_DEPTH_TEST);
 
   // Clear color buffer and Depth Buffer
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -256,16 +282,17 @@ void SDLGraphicsProgram::loop() {
     static float rotate = 0.0f;
     // MVP matrices
     glm::mat4 projection = glm::perspective(
-        45.0f, ((float)screenWidth) / ((float)screenHeight), 0.1f, 20.0f);
+        45.0f, ((float)screenWidth) / ((float)screenHeight), 0.1f, 30.0f);
 
     glm::mat4 model = glm::mat4(1.0f);
     // the first translate is for pushing the entire tetris world back
-    model = glm::translate(model, glm::vec3(-0.0f, -5.0f, -15.0f));
+    model = glm::translate(model, glm::vec3(0.0f, -5.0f, -20.0f));
     // the rotate is for rotating the tetris itself
     model = glm::rotate(model, rotate, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
     // the second translate is to offset the center of the tetris world from
-    // (3,0,3) to (0,0,0)
-    model = glm::translate(model, glm::vec3(-3.0f, 0.0f, -3.0f));
+    model = glm::translate(model, glm::vec3(-(float)tetris.GetX() / 2.0f, 0.0f,
+                                            -(float)tetris.GetZ() / 2.0f));
 
     glm::mat4 view =
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -5.0f),
@@ -281,7 +308,7 @@ void SDLGraphicsProgram::loop() {
     glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE,
                        &projection[0][0]);
 
-    static bool isKeyDown(false);
+    static bool isMouseButtonDown(false);
     // Handle events on queue
     while (SDL_PollEvent(&e) != 0) {
       // User posts an event to quit
@@ -291,16 +318,48 @@ void SDLGraphicsProgram::loop() {
           quit = true;
           break;
         case SDL_KEYDOWN:
-          HandleKeyDown(quit, &e.key);
+          switch (e.key.keysym.sym) {
+            case SDLK_w:  // pressed 2
+              m_isFilled = !m_isFilled;
+              m_isFilled ? glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+                         : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+              break;
+            case SDLK_q:  // pressed q
+              quit = true;
+              break;
+            case SDLK_LEFT:
+              m_Direction =
+                  (rotate < PI / 4 && rotate > -PI / 4) ? D_LEFT : D_RIGHT;
+              break;
+            case SDLK_RIGHT:
+              m_Direction =
+                  (rotate < PI / 4 && rotate > -PI / 4) ? D_RIGHT : D_LEFT;
+              break;
+            case SDLK_r:
+              m_Rotation = R_CW;
+              break;
+            case SDLK_t:
+              m_Rotation = R_CCW;
+              break;
+            default:
+              m_Direction = D_DOWN;
+              m_Rotation = R_NONE;
+              break;
+          }
           break;
         case SDL_MOUSEBUTTONUP:
-          isKeyDown = false;
+          isMouseButtonDown = false;
           break;
         case SDL_MOUSEBUTTONDOWN:
-          isKeyDown = true;
+          isMouseButtonDown = true;
         case SDL_MOUSEMOTION:
-          if (isKeyDown) {
+          if (isMouseButtonDown) {
             rotate = (float)e.motion.x / screenWidth * 10;
+            if (rotate > PI) {
+              rotate -= PI;
+            } else if (rotate < -PI) {
+              rotate += PI;
+            }
           }
           break;
         default:
@@ -313,10 +372,17 @@ void SDLGraphicsProgram::loop() {
     render();
     // Update screen of our specified window
     SDL_GL_SwapWindow(getSDLWindow());
-    SDL_Delay(750);
+    SDL_Delay(m_delay);
+    m_timer += m_delay;
   }
+  // Update our scene
+  update();
+  // Render using OpenGL
+  render();
+  // Update screen of our specified window
+  SDL_GL_SwapWindow(getSDLWindow());
+  SDL_Delay(750);
 
-  // Disable text input
   SDL_StopTextInput();
 }
 

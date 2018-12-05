@@ -23,6 +23,7 @@
 #include <climits>
 #include <iostream>
 #include <vector>
+#include <random>
 
 class TetrisWorld {
  public:
@@ -32,7 +33,9 @@ class TetrisWorld {
   void Update(Direction, Rotation);
   int GetPoints();
   bool IsEndGame();
-
+    inline unsigned int GetX() { return board_x;}
+    inline unsigned int GetY() { return board_y;}
+    inline unsigned int GetZ() { return board_z;}
   std::vector<Cube*> GetAllCubes();
 
  private:
@@ -42,7 +45,7 @@ class TetrisWorld {
   void GenNextFigure();
   Tetromino* m_CurrentMovingCubes;
   std::vector<Cube*> m_Cubes;
-  bool isGameOver;
+    bool isGameOver{false};
 
   bool IsColliding();
   void Merge();     // if colliding, merge current moving cubes to all cubes

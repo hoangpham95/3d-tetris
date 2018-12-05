@@ -36,7 +36,7 @@ void TetrisWorld::Move(Direction d) {
       }
       break;
     case D_LEFT:
-      std::cout << "Move left" << std::endl;
+//      std::cout << "Move left" << std::endl;
       for (int i = 0; i < m_CurrentMovingCubes->getCubes().size(); i++) {
         Cube* curr = m_CurrentMovingCubes->getCubes()[i];
         if (curr->m_x == 0) {
@@ -54,21 +54,21 @@ void TetrisWorld::Move(Direction d) {
       m_CurrentMovingCubes->Move(d);
       break;
     case D_RIGHT:
-      std::cout << "Tetris world: Move right" << std::endl;
+//      std::cout << "Tetris world: Move right" << std::endl;
       for (int i = 0; i < m_CurrentMovingCubes->getCubes().size(); i++) {
         Cube* curr = m_CurrentMovingCubes->getCubes()[i];
         if (curr->m_x == board_x - 1) {
-          std::cout << "Collide board" << std::endl;
+//          std::cout << "Collide board" << std::endl;
           return;
         } else {
           for (int j = 0; j < m_Cubes.size(); j++) {
             Cube* c = m_Cubes[j];
             if (c->m_y == curr->m_y && c->m_x - 1 == curr->m_x) {
-              std::cout << "Collide right" << std::endl;
+//              std::cout << "Collide right" << std::endl;
               return;
             }
           }
-          std::cout << "Not right collision" << std::endl;
+//          std::cout << "Not right collision" << std::endl;
         }
       }
 
@@ -95,13 +95,13 @@ bool TetrisWorld::IsColliding() {
       }
     }
   }
-  std::cout << "Not Colliding" << std::endl;
+//  std::cout << "Not Colliding" << std::endl;
 
   return false;
 }
 
 void TetrisWorld::Merge() {
-  std::cout << "Merge" << std::endl;
+//  std::cout << "Merge" << std::endl;
   for (int i = 0; i < m_CurrentMovingCubes->getCubes().size(); i++) {
     Cube* next = m_CurrentMovingCubes->getCubes()[i];
     m_Cubes.push_back(next);
@@ -128,8 +128,11 @@ void TetrisWorld::Merge() {
 
 // generate next figure, need to talk to Zachary
 void TetrisWorld::GenNextFigure() {
-  std::cout << "Gen next tetromino" << std::endl;
-  int shape = std::rand() % 7;
+//  std::cout << "Gen next tetromino" << std::endl;
+    static std::random_device rd;
+    static std::mt19937_64 gen(rd());
+    std::uniform_int_distribution<> dis(0, 7);
+    int shape = dis(gen);
   m_CurrentMovingCubes = new Tetromino(static_cast<Shape>(shape), board_y);
 }
 
@@ -148,7 +151,7 @@ bool TetrisWorld::Collapse() {
   }
 
   if (count == board_x) {
-    std::cout << "Collapsed:" << count << std::endl;
+//    std::cout << "Collapsed:" << count << std::endl;
     for (int i = 0; i < board_x; i++) {
       m_Cubes.erase(m_Cubes.begin());
     }
@@ -160,7 +163,7 @@ bool TetrisWorld::Collapse() {
     return true;
   }
 
-  std::cout << "Not collapse: " << count << std::endl;
+//  std::cout << "Not collapse: " << count << std::endl;
 
   return false;
 }
