@@ -2,51 +2,53 @@
 
 std::vector<Cube*> Tetromino::getCubes() { return m_Cubes; }
 
-void Tetromino::genCubeCoords(float* cubeCoords, int board_h) {
+void Tetromino::genCubeCoords(float* cubeCoords, const int& board_h,
+                              float* color) {
   for (int i = 0; i < 4; i++) {
-    m_Cubes.push_back(new Cube(cubeCoords[4 * i],
-                               board_h - cubeCoords[4 * i + 1],
-                               cubeCoords[4 * i + 2]));
+    Cube* newC = new Cube(cubeCoords[3 * i], board_h - cubeCoords[3 * i + 1],
+                          cubeCoords[3 * i + 2]);
+    newC->SetColor(color[0], color[1], color[2], color[3]);
+    m_Cubes.push_back(newC);
   }
 }
 
-Tetromino::Tetromino(Shape s, int board_h) {
+Tetromino::Tetromino(Shape s, const int& board_h) {
   float* cubeCoords;
   if (s == L) {
     m_Center = new Cube(0.5f, board_h + 1.5f, 0);
     float cubeCoords[12] = {0.0f, -1.0f, 0.0f, 0.0f, -2.0f, 0.0f,
                             1.0f, -1.0f, 0.0f, 1.0f, -2.0f, 0.0f};
-    genCubeCoords(cubeCoords, board_h);
+    genCubeCoords(cubeCoords, board_h, RED);
   } else if (s == Z) {
     m_Center = new Cube(1.0f, board_h + 1.0f, 0);
     float cubeCoords[12] = {0.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
                             2.0f, -1.0f, 0.0f, 3.0f, -1.0f, 0.0f};
-    genCubeCoords(cubeCoords, board_h);
+    genCubeCoords(cubeCoords, board_h, GREEN);
   } else if (s == I) {
-    m_Center = new Cube(1.0f, -1.0f, 0);
+    m_Center = new Cube(1.0f, board_h + 1.0f, 0);
     float cubeCoords[12] = {0.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
                             2.0f, -1.0f, 0.0f, 2.0f, -2.0f, 0.0f};
-    genCubeCoords(cubeCoords, board_h);
+    genCubeCoords(cubeCoords, board_h, BLUE);
   } else if (s == J) {
-    m_Center = new Cube(1.0f, -1.0f, 0);
+    m_Center = new Cube(1.0f, board_h + 1.0f, 0);
     float cubeCoords[12] = {0.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
                             2.0f, -1.0f, 0.0f, 0.0f, -2.0f, 0.0f};
-    genCubeCoords(cubeCoords, board_h);
+    genCubeCoords(cubeCoords, board_h, PURPLE);
   } else if (s == O) {
-    m_Center = new Cube(1.0f, -1.0f, 0);
+    m_Center = new Cube(1.0f, board_h + 1.0f, 0);
     float cubeCoords[12] = {0.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
                             2.0f, -1.0f, 0.0f, 1.0f, -2.0f, 0.0f};
-    genCubeCoords(cubeCoords, board_h);
+    genCubeCoords(cubeCoords, board_h, CYAN);
   } else if (s == S) {
-    m_Center = new Cube(1.0f, -1.0f, 0);
+    m_Center = new Cube(1.0f, board_h + 1.0f, 0);
     float cubeCoords[12] = {0.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
                             1.0f, -2.0f, 0.0f, 2.0f, -2.0f, 0.0f};
-    genCubeCoords(cubeCoords, board_h);
+    genCubeCoords(cubeCoords, board_h, ORANGE);
   } else if (s == T) {
-    m_Center = new Cube(1.0f, -1.0f, 0);
+    m_Center = new Cube(1.0f, board_h + 1.0f, 0);
     float cubeCoords[12] = {0.0f, -2.0f, 0.0f, 1.0f, -2.0f, 0.0f,
                             1.0f, -1.0f, 0.0f, 2.0f, -1.0f, 0.0f};
-    genCubeCoords(cubeCoords, board_h);
+    genCubeCoords(cubeCoords, board_h, PINK);
   } else {
     return;
   }

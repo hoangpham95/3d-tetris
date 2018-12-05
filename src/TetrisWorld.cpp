@@ -9,7 +9,9 @@
 #include "TetrisWorld.hpp"
 
 TetrisWorld::TetrisWorld(unsigned int x, unsigned int y, unsigned int z)
-    : board_x(x), board_y(y), board_z(z) {}
+    : board_x(x), board_y(y), board_z(z) {
+  GenNextFigure();
+}
 
 TetrisWorld::~TetrisWorld() {}
 
@@ -122,7 +124,7 @@ void TetrisWorld::Merge() {
 // generate next figure, need to talk to Zachary
 void TetrisWorld::GenNextFigure() {
   delete m_CurrentMovingCubes;
-  int shape = rand() % 7;
+  int shape = std::rand() % 7;
   m_CurrentMovingCubes = new Tetromino(static_cast<Shape>(shape), board_y);
 }
 
@@ -153,4 +155,18 @@ bool TetrisWorld::Collapse() {
   }
 
   return false;
+}
+
+std::vector<Cube*> TetrisWorld::GetAllCubes() {
+  std::vector<Cube*> res;
+
+  for (int i = 0; i < m_Cubes.size(); i++) {
+    res.push_back(m_Cubes[i]);
+  }
+
+  for (int i = 0; i < m_CurrentMovingCubes->getCubes().size(); i++) {
+    res.push_back(m_CurrentMovingCubes->getCubes()[i]);
+  }
+
+  return res;
 }

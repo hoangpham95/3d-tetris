@@ -33,6 +33,8 @@ class TetrisWorld {
   int GetPoints();
   bool IsEndGame();
 
+  std::vector<Cube*> GetAllCubes();
+
  private:
   unsigned int board_x, board_y, board_z;
   unsigned int points{0};
