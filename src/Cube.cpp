@@ -349,3 +349,8 @@ Cube* Cube::DuplicateCubeUnit() {
 
   return dupCubeUnit[0];
 }
+
+void Cube::UpdateCubeUnitLocation(float dx, float dy, float dz) {
+    SetLocation(m_x + dx, m_y + dy, m_z + dz);
+    UpdateCubeUnitLocation();
+}

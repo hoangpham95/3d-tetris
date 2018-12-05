@@ -24,6 +24,9 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <deque>
+
+#include "CubeUnitFactory.hpp"
 
 class TetrisWorld {
  public:
@@ -43,8 +46,9 @@ class TetrisWorld {
   unsigned int points{0};
 
   void GenNextFigure();
-  Tetromino* m_CurrentMovingCubes;
-  std::vector<Cube*> m_Cubes;
+    Cube* m_currCubeUnit;
+    std::vector<Cube*> m_currCubeUnitArray;
+  std::deque<Cube*> m_Cubes;
     bool isGameOver{false};
 
   bool IsColliding();
@@ -52,6 +56,10 @@ class TetrisWorld {
   bool Collapse();  // action when 1 surface has been filled
   void Move(Direction);
   void Rotate(Rotation);
+   inline static bool compareY(Cube* c1, Cube* c2) { return c1->m_y < c2->m_y;}
+    inline static bool compareYX(Cube* c1, Cube* c2) {
+        return (c1->m_y < c2->m_y)? true : (c1->m_x < c2->m_x);
+    }
 };
 
 #endif /* TetrisWorld_hpp */
