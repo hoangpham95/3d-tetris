@@ -87,7 +87,6 @@ void Tetromino::Rotate(Rotation r) {
         float x = cur->m_x, y = cur->m_y;
         cur->m_x = m_Center->m_x + (m_Center->m_y - y);
         cur->m_y = m_Center->m_y + (m_Center->m_x - x);
-        std::cout << "==> " << cur << std::endl;
       }
       break;
     case R_CW:

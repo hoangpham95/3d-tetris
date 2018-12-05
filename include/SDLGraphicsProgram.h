@@ -83,10 +83,6 @@ class SDLGraphicsProgram {
   unsigned short m_singleCubeVertexNum;
   unsigned short m_singleCubeIndexNum;
 
-  // User interaction
-  void HandleKeyDown(bool& quit, SDL_KeyboardEvent* pe);
-  void HanleMouseDrag(SDL_MouseMotionEvent* me);
-
   // Setting up OpenGL
   // It wills load shaders and compile shaders
   // Returns true if successful, false otherwise
