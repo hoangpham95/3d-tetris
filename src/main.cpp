@@ -9,7 +9,7 @@
 int main(int argc, char** argv) {
   std::cout << "(main.cpp) Beginning Intitialization\n";
   // Create an instance of an object for a SDLGraphicsProgram
-  SDLGraphicsProgram mySDLGraphicsProgram(480, 720, TetrisWorld(3, 5, 1));
+  SDLGraphicsProgram mySDLGraphicsProgram(480, 960, TetrisWorld(8, 10, 1));
   // Run our program forever
   mySDLGraphicsProgram.loop();
   // When our program ends, it will exit scope, the

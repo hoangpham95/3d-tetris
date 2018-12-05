@@ -48,6 +48,8 @@ class SDLGraphicsProgram {
   void getOpenGLVersionInfo();
 
  private:
+  Direction m_Direction{D_DOWN};
+  Rotation m_Rotation{R_NONE};
   TetrisWorld tetris;
   // Screen dimension constants
   int screenHeight;

@@ -145,6 +145,7 @@ void SDLGraphicsProgram::DeleteBuffer() {
 }
 
 void SDLGraphicsProgram::update() {
+  tetris.Update(m_Direction, m_Rotation);
   std::vector<Cube*> cubes = tetris.GetAllCubes();
   //   std::cout << "Cube size: " << cubes.size() << std::endl;
   std::vector<float> cubeLocs;
@@ -158,10 +159,14 @@ void SDLGraphicsProgram::update() {
   for (int i = 0; i < cubes.size(); i++) {
     float* cubeColor = cubes[i]->GetColor();
     for (int j = 0; j < 4; j++) {
-      cubeCols.push_back(cubeColor[i]);
+      cubeCols.push_back(0.5f);
     }
   }
   makeCubes(cubes.size(), cubeLocs, cubeCols);
+
+  // finishing rendering, reset back to old move
+  m_Direction = D_DOWN;
+  m_Rotation = R_NONE;
 }
 
 void SDLGraphicsProgram::makeCubes(int numCubes,
@@ -244,6 +249,10 @@ void SDLGraphicsProgram::loop() {
   SDL_StartTextInput();
   // While application is running
   while (!quit) {
+    if (tetris.IsEndGame()) {
+      quit = true;
+      break;
+    }
     static float rotate = 0.0f;
     // MVP matrices
     glm::mat4 projection = glm::perspective(
@@ -259,7 +268,7 @@ void SDLGraphicsProgram::loop() {
     model = glm::translate(model, glm::vec3(-3.0f, 0.0f, -3.0f));
 
     glm::mat4 view =
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f),
+        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -5.0f),
                     glm::vec3(0.0f, 1.0f, 0.0f));
 
     GLint modelUniformLocation = glGetUniformLocation(shader, "model");
@@ -304,7 +313,7 @@ void SDLGraphicsProgram::loop() {
     render();
     // Update screen of our specified window
     SDL_GL_SwapWindow(getSDLWindow());
-    SDL_Delay(25);
+    SDL_Delay(600);
   }
 
   // Disable text input
@@ -449,7 +458,21 @@ void SDLGraphicsProgram::HandleKeyDown(bool& quit, SDL_KeyboardEvent* pe) {
     case SDLK_q:  // pressed q
       quit = true;
       break;
+    case SDLK_LEFT:
+      m_Direction = D_LEFT;
+      break;
+    case SDLK_RIGHT:
+      m_Direction = D_RIGHT;
+      break;
+    case SDLK_r:
+      m_Rotation = R_CW;
+      break;
+    case SDLK_t:
+      m_Rotation = R_CCW;
+      break;
     default:
+      m_Direction = D_DOWN;
+      m_Rotation = R_NONE;
       break;
   }
 }

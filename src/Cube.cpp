@@ -52,7 +52,6 @@ void JoinZ(Cube* zNeg, Cube* zPos) {
 }
 
 std::ostream& operator<<(std::ostream& out, const Cube& cube) {
-  out << "Cube(id:" << cube.m_id;
   out << "|xyz:" << cube.m_x << "," << cube.m_y << "," << cube.m_z << ")";
   return out;
 }

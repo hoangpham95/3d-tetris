@@ -19,12 +19,12 @@ Tetromino::Tetromino(Shape s, const int& board_h) {
     float cubeCoords[12] = {0.0f, -1.0f, 0.0f, 0.0f, -2.0f, 0.0f,
                             1.0f, -1.0f, 0.0f, 1.0f, -2.0f, 0.0f};
     genCubeCoords(cubeCoords, board_h, RED);
-  } else if (s == Z) {
+  } else if (s == I) {
     m_Center = new Cube(1.0f, board_h + 1.0f, 0);
     float cubeCoords[12] = {0.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
                             2.0f, -1.0f, 0.0f, 3.0f, -1.0f, 0.0f};
     genCubeCoords(cubeCoords, board_h, GREEN);
-  } else if (s == I) {
+  } else if (s == Z) {
     m_Center = new Cube(1.0f, board_h + 1.0f, 0);
     float cubeCoords[12] = {0.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f,
                             2.0f, -1.0f, 0.0f, 2.0f, -2.0f, 0.0f};
@@ -69,12 +69,11 @@ void Tetromino::Move(Direction d) {
       }
       break;
     case D_RIGHT:
+      std::cout << "Tetromino: Move right" << std::endl;
       m_Center->m_x += 1;
       for (int i = 0; i < m_Cubes.size(); i++) {
         m_Cubes[i]->m_x += 1;
       }
-    case D_NONE:
-      break;
     default:
       break;
   }
@@ -85,13 +84,17 @@ void Tetromino::Rotate(Rotation r) {
     case R_CCW:
       for (int i = 0; i < m_Cubes.size(); i++) {
         Cube* cur = m_Cubes[i];
-        cur->m_x = m_Center->m_x + (m_Center->m_y - cur->m_y);
-        cur->m_y = m_Center->m_y + (cur->m_x - m_Center->m_x);
+        float x = cur->m_x, y = cur->m_y;
+        cur->m_x = m_Center->m_x + (m_Center->m_y - y);
+        cur->m_y = m_Center->m_y + (m_Center->m_x - x);
+        std::cout << "==> " << cur << std::endl;
       }
+      break;
     case R_CW:
       Rotate(R_CCW);
       Rotate(R_CCW);
       Rotate(R_CCW);
+      break;
     default:
       break;
   }
