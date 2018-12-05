@@ -60,6 +60,8 @@ class SDLGraphicsProgram {
   SDL_GLContext gContext;
   // For now, we can have one shader.
   unsigned int shader;
+    // stride in vertex buffer
+    unsigned short m_stride;
   // Vertex Array Object
   GLuint VAOId;
   // Vertex Buffer
@@ -116,6 +118,15 @@ class SDLGraphicsProgram {
   //   cube. Hence, the length of the array is 4*numCubes
   void makeCubes(int numCubes, std::vector<float> cubeLocations,
                  std::vector<float> cubeColors);
+    
+    // timer
+    // counting time
+    // every loop will be delayed by m_delay
+    // every loop will increase m_timer by m_delay
+    // when timer reaches m_gameSpped, move down the current cubes 1 unit, reset timer.
+    unsigned int m_timer{0};
+    unsigned int m_delay{25};
+    unsigned int m_gameSpeed{1000};
 };
 
 #endif
