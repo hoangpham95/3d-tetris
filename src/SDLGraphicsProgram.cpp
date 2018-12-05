@@ -313,7 +313,7 @@ void SDLGraphicsProgram::loop() {
     render();
     // Update screen of our specified window
     SDL_GL_SwapWindow(getSDLWindow());
-    SDL_Delay(600);
+    SDL_Delay(750);
   }
 
   // Disable text input

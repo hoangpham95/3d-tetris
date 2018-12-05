@@ -18,11 +18,8 @@ TetrisWorld::~TetrisWorld() {}
 // tetris will always going down on each tick
 void TetrisWorld::Update(Direction d, Rotation r) {
   // need to talk to Zachary about the coordinates of the cube
-  if (r != R_NONE) {
-    Rotate(r);
-  } else {
-    Move(d);
-  }
+  Rotate(r);
+  Move(d);
 }
 
 int TetrisWorld::GetPoints() { return points; }
