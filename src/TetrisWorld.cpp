@@ -33,10 +33,18 @@ int TetrisWorld::GetPoints() { return points; }
 bool TetrisWorld::IsEndGame() { return isGameOver; }
 
 void TetrisWorld::Move(Direction d) {
-    // use hasCube[i + board_x * j + board_x * board_y * k] to access the (i,j,k) location
-    std::vector<bool> hasCube(board_x * board_y * board_z, false);
+    std::vector<std::vector<std::vector<bool>>> cubesArray;
+    for(int i = 0; i <= board_x; i++) {
+        std::vector<std::vector<bool>> y;
+        for(int j = 0; j <= board_y; j++) {
+            std::vector<bool> z(board_z + 1, false);
+            y.push_back(z);
+        }
+        cubesArray.push_back(y);
+    }
+    
     for(Cube* c : m_Cubes) {
-        hasCube[c->m_x + board_x * c->m_y + board_x * board_y * c->m_z] = true;
+        cubesArray[c->m_x][c->m_y][c->m_z] = true;
     }
     
     switch (d) {
@@ -48,60 +56,60 @@ void TetrisWorld::Move(Direction d) {
                     m_currCubeUnit->UpdateCubeUnitLocation(0, 1, 0);
                     Merge();
                     break;
-                } else if(hasCube[c->m_x + board_x * c->m_y + board_x * board_y * c->m_z]) {
+                } else if(cubesArray[c->m_x][c->m_y][c->m_z]) {
                     m_currCubeUnit->UpdateCubeUnitLocation(0, 1, 0);
                     Merge();
                     break;
                 }
             }
             break;
-        case D_LEFT:
+        case D_XNEG:
             m_currCubeUnit->UpdateCubeUnitLocation(-1, 0, 0);
             for(Cube* c : m_currCubeUnitArray) {
                 // undo if there is conflict
-                if(hasCube[c->m_x + board_x * c->m_y + board_x * board_y * c->m_z]) {
+                if(c->m_x < 0) {
                     m_currCubeUnit->UpdateCubeUnitLocation(1, 0, 0);
                     break;
-                } else if(c->m_x < 0) {
+                } else if(cubesArray[c->m_x][c->m_y][c->m_z]) {
                     m_currCubeUnit->UpdateCubeUnitLocation(1, 0, 0);
                     break;
                 }
             }
             break;
-        case D_RIGHT:
+        case D_XPOS:
             m_currCubeUnit->UpdateCubeUnitLocation(1, 0, 0);
             for(Cube* c : m_currCubeUnitArray) {
                 // undo if there is conflict
-                if(hasCube[c->m_x + board_x * c->m_y + board_x * board_y * c->m_z]) {
+                if(c->m_x > board_x) {
                     m_currCubeUnit->UpdateCubeUnitLocation(-1, 0, 0);
                     break;
-                } else if(c->m_x > board_x) {
+                } else if(cubesArray[c->m_x][c->m_y][c->m_z]) {
                     m_currCubeUnit->UpdateCubeUnitLocation(-1, 0, 0);
                     break;
                 }
             }
             break;
-        case D_FRONT:
+        case D_ZNEG:
             m_currCubeUnit->UpdateCubeUnitLocation(0, 0, -1);
             for(Cube* c : m_currCubeUnitArray) {
                 // undo if there is conflict
-                if(hasCube[c->m_x + board_x * c->m_y + board_x * board_y * c->m_z]) {
+                if(c->m_z < 0) {
                     m_currCubeUnit->UpdateCubeUnitLocation(0, 0, 1);
                     break;
-                } else if(c->m_z < 0) {
+                } else if(cubesArray[c->m_x][c->m_y][c->m_z]) {
                     m_currCubeUnit->UpdateCubeUnitLocation(0, 0, 1);
                     break;
                 }
             }
             break;
-        case D_BACK:
+        case D_ZPOS:
             m_currCubeUnit->UpdateCubeUnitLocation(0, 0, 1);
             for(Cube* c : m_currCubeUnitArray) {
                 // undo if there is conflict
-                if(hasCube[c->m_x + board_x * c->m_y + board_x * board_y * c->m_z]) {
+                if(c->m_z > board_z) {
                     m_currCubeUnit->UpdateCubeUnitLocation(0, 0, -1);
                     break;
-                } else if(c->m_z > board_z) {
+                } else if(cubesArray[c->m_x][c->m_y][c->m_z]) {
                     m_currCubeUnit->UpdateCubeUnitLocation(0, 0, -1);
                     break;
                 }
@@ -113,24 +121,98 @@ void TetrisWorld::Move(Direction d) {
 }
 
 void TetrisWorld::Rotate(Rotation r) {
+    std::vector<std::vector<std::vector<bool>>> cubesArray;
+    for(int i = 0; i <= board_x; i++) {
+        std::vector<std::vector<bool>> y;
+        for(int j = 0; j <= board_y; j++) {
+            std::vector<bool> z(board_z + 1, false);
+            y.push_back(z);
+        }
+        cubesArray.push_back(y);
+    }
+    
+    for(Cube* c : m_Cubes) {
+        cubesArray[c->m_x][c->m_y][c->m_z] = true;
+    }
+    
     switch (r) {
         case R3_XCW:
             m_currCubeUnit->RotateCubeUnitOverX(false);
+            for(Cube* c : m_currCubeUnitArray) {
+                // undo if there is conflict
+                if(c->m_x < 0 || c->m_x > board_x || c->m_y < 0 || c->m_y > board_y || c->m_z < 0 || c->m_z > board_z) {
+                    m_currCubeUnit->RotateCubeUnitOverX(true);
+                    break;
+                } else if(cubesArray[c->m_x][c->m_y][c->m_z]) {
+                    m_currCubeUnit->RotateCubeUnitOverX(true);
+                    break;
+                }
+            }
             break;
         case R3_XCCW:
             m_currCubeUnit->RotateCubeUnitOverX(true);
+            for(Cube* c : m_currCubeUnitArray) {
+                // undo if there is conflict
+                if(c->m_x < 0 || c->m_x > board_x || c->m_y < 0 || c->m_y > board_y || c->m_z < 0 || c->m_z > board_z) {
+                    m_currCubeUnit->RotateCubeUnitOverX(false);
+                    break;
+                } else if(cubesArray[c->m_x][c->m_y][c->m_z]) {
+                    m_currCubeUnit->RotateCubeUnitOverX(false);
+                    break;
+                }
+            }
             break;
         case R3_YCW:
             m_currCubeUnit->RotateCubeUnitOverY(false);
+            for(Cube* c : m_currCubeUnitArray) {
+                // undo if there is conflict
+                if(c->m_x < 0 || c->m_x > board_x || c->m_y < 0 || c->m_y > board_y || c->m_z < 0 || c->m_z > board_z) {
+                    m_currCubeUnit->RotateCubeUnitOverY(true);
+                    break;
+                } else if(cubesArray[c->m_x][c->m_y][c->m_z]) {
+                    m_currCubeUnit->RotateCubeUnitOverY(true);
+                    break;
+                }
+            }
             break;
         case R3_YCCW:
             m_currCubeUnit->RotateCubeUnitOverY(true);
+            for(Cube* c : m_currCubeUnitArray) {
+                // undo if there is conflict
+                if(c->m_x < 0 || c->m_x > board_x || c->m_y < 0 || c->m_y > board_y || c->m_z < 0 || c->m_z > board_z) {
+                    m_currCubeUnit->RotateCubeUnitOverY(false);
+                    break;
+                } else if(cubesArray[c->m_x][c->m_y][c->m_z]) {
+                    m_currCubeUnit->RotateCubeUnitOverY(false);
+                    break;
+                }
+            }
             break;
         case R3_ZCW:
             m_currCubeUnit->RotateCubeUnitOverZ(false);
+            for(Cube* c : m_currCubeUnitArray) {
+                // undo if there is conflict
+                if(c->m_x < 0 || c->m_x > board_x || c->m_y < 0 || c->m_y > board_y || c->m_z < 0 || c->m_z > board_z) {
+                    m_currCubeUnit->RotateCubeUnitOverZ(true);
+                    break;
+                } else if(cubesArray[c->m_x][c->m_y][c->m_z]) {
+                    m_currCubeUnit->RotateCubeUnitOverZ(true);
+                    break;
+                }
+            }
             break;
         case R3_ZCCW:
             m_currCubeUnit->RotateCubeUnitOverZ(true);
+            for(Cube* c : m_currCubeUnitArray) {
+                // undo if there is conflict
+                if(c->m_x < 0 || c->m_x > board_x || c->m_y < 0 || c->m_y > board_y || c->m_z < 0 || c->m_z > board_z) {
+                    m_currCubeUnit->RotateCubeUnitOverZ(false);
+                    break;
+                } else if(cubesArray[c->m_x][c->m_y][c->m_z]) {
+                    m_currCubeUnit->RotateCubeUnitOverZ(false);
+                    break;
+                }
+            }
             break;
         default:
             break;
@@ -195,16 +277,17 @@ void TetrisWorld::GenNextFigure() {
 
 bool TetrisWorld::Collapse() {
     std::sort(m_Cubes.begin(), m_Cubes.end(), TetrisWorld::compareY);
-
+    
+    int numCubeLayer =(board_x + 1) * (board_z + 1);
     // not enough cube, return false
-    if(m_Cubes.size() < board_x * board_z) {
+    if(m_Cubes.size() < numCubeLayer) {
         return false;
     }
     
     // group cubes by y layer
-    std::vector<std::vector<Cube*>> layerCubes;
+    std::vector<int> layerCounts(board_y + 1, 0);
     for(Cube* c : m_Cubes) {
-        layerCubes[c->m_y].push_back(c);
+        layerCounts[c->m_y]++;
     }
     
     bool isCollapse = false;
@@ -212,7 +295,7 @@ bool TetrisWorld::Collapse() {
     
     // find the first deleted layer
     for(int i = 0; i < board_y; ++i) {
-        if(layerCubes[i].size() == board_x * board_z) {
+        if(layerCounts[i] == numCubeLayer) {
             isCollapse = true;
             deletingLayer = i;
             break;
@@ -227,7 +310,11 @@ bool TetrisWorld::Collapse() {
     // collapsing
     int beginDeleteIdx = 0;
     for(int i = 0; i < deletingLayer; ++i) {
-        beginDeleteIdx += layerCubes[i].size();
+        beginDeleteIdx += layerCounts[i];
+    }
+    
+    for(int i = beginDeleteIdx; i < beginDeleteIdx + numCubeLayer; ++i) {
+        delete m_Cubes[i];
     }
     
     // change cube location above the layer
@@ -241,18 +328,12 @@ bool TetrisWorld::Collapse() {
     m_Cubes.erase(m_Cubes.begin()+beginDeleteIdx,
                   m_Cubes.begin()+beginDeleteIdx + board_x * board_z);
     
-    // deallocated deleted cubes
-    for(Cube* c : layerCubes[deletingLayer]) {
-        delete c;
-    }
-    
     return true;
 }
 
 std::vector<Cube*> TetrisWorld::GetAllCubes() {
     std::vector<Cube*> res;
     
-    std::cout << m_Cubes.size();
     for (int i = 0; i < m_Cubes.size(); i++) {
         res.push_back(m_Cubes[i]);
     }

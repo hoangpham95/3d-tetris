@@ -286,7 +286,7 @@ void SDLGraphicsProgram::loop() {
 
     glm::mat4 model = glm::mat4(1.0f);
     // the first translate is for pushing the entire tetris world back
-    model = glm::translate(model, glm::vec3(0.0f, -5.0f, -20.0f));
+    model = glm::translate(model, glm::vec3(0.0f, -3.0f, -20.0f));
     // the rotate is for rotating the tetris itself
     model = glm::rotate(model, rotate, glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
@@ -295,7 +295,8 @@ void SDLGraphicsProgram::loop() {
                                             -(float)tetris.GetZ() / 2.0f));
 
     glm::mat4 view =
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -5.0f),
+        glm::lookAt(glm::vec3(0.0f, 1.0f, 0.0f),
+                    glm::vec3(0.0f, 0.0f, -5.0f),
                     glm::vec3(0.0f, 1.0f, 0.0f));
 
     GLint modelUniformLocation = glGetUniformLocation(shader, "model");
@@ -331,23 +332,65 @@ void SDLGraphicsProgram::loop() {
                   m_Rotation = R3_XCCW;
                   break;
               case SDLK_2:
-                  m_Rotation = R3_YCCW;
+                  m_Rotation = R3_XCW;
                   break;
               case SDLK_3:
+                  m_Rotation = R3_YCCW;
+                  break;
+              case SDLK_4:
+                  m_Rotation = R3_YCW;
+                  break;
+              case SDLK_5:
                   m_Rotation = R3_ZCCW;
                   break;
+              case SDLK_6:
+                  m_Rotation = R3_ZCW;
+                  break;
             case SDLK_LEFT:
-                  m_Direction = D_LEFT;
+                  if(rotate < PI/4.0f && rotate > -PI/4.0f) {
+                      m_Direction = D_XNEG;
+                  } else if (rotate > PI/4.0f && rotate < 3.0f*PI/4.0f) {
+                      m_Direction = D_ZNEG;
+                  } else if (rotate > 3.0f*PI/4.0f && rotate < -3.0f*PI/4.0f) {
+                      m_Direction = D_XPOS;
+                  } else {
+                      m_Direction = D_ZPOS;
+                  }
               break;
             case SDLK_RIGHT:
-                  m_Direction = D_RIGHT;
+                  if(rotate < PI/4.0f && rotate > -PI/4.0f) {
+                      m_Direction = D_XPOS;
+                  } else if (rotate > PI/4.0f && rotate < 3*PI/4.0f) {
+                      m_Direction = D_ZPOS;
+                  } else if (rotate > 3*PI/4.0f && rotate < -3*PI/4.0f) {
+                      m_Direction = D_XNEG;
+                  } else {
+                      m_Direction = D_ZNEG;
+                  }
               break;
-            case SDLK_UP:
-                  m_Direction = D_BACK;
-                  break;
-              case SDLK_DOWN:
-                  m_Direction = D_FRONT;
-                  break;
+//            case SDLK_UP:
+//                  if(rotate < -PI/2) {
+//                      m_Direction = D_BACK;
+//                  } else if (rotate < 0) {
+//                      m_Direction = D_LEFT;
+//                  } else if (rotate < PI/2) {
+//                      m_Direction = D_FRONT;
+//                  } else {
+//                      m_Direction = D_RIGHT;
+//                  }
+//                  break;
+//              case SDLK_DOWN:
+//                  if(rotate < -PI/2) {
+//                      m_Direction = D_FRONT;
+//                  } else if (rotate < 0) {
+//                      m_Direction = D_RIGHT;
+//                  } else if (rotate < PI/2) {
+//                      m_Direction = D_BACK;
+//                  } else {
+//                      m_Direction = D_LEFT;
+//                  }
+//                  m_Direction = D_FRONT;
+//                  break;
             default:
               m_Direction = D_DOWN;
               m_Rotation = R_NONE;
@@ -361,11 +404,11 @@ void SDLGraphicsProgram::loop() {
           isMouseButtonDown = true;
         case SDL_MOUSEMOTION:
           if (isMouseButtonDown) {
-            rotate = (float)e.motion.x / screenWidth * 10;
+            rotate = (float)e.motion.x / screenWidth * 10.0f;
             if (rotate > PI) {
-              rotate -= PI;
+              rotate -= 2*PI;
             } else if (rotate < -PI) {
-              rotate += PI;
+              rotate += 2*PI;
             }
           }
           break;
