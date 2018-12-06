@@ -1,16 +1,21 @@
+anything outside of curly braces is comment
+remove the "/" in front of "{" and "}" to enable that shape to be drawn
 {
-    3 2 1
+    3 2 2
+    0 0 1
+    1 1 1
     0 0 1
     1 1 1
 }
-anything outside of curly braces is comment
+
 {
-    3 2 1
-    0 1 1
-    1 1 1
+    2 1 2
+    1 1
+    1 1
 }
-{
-    4 1 1
+/{
+    4 2 1
+    1 1 1 1
     1 1 1 1
 }
 {

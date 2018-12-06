@@ -5,7 +5,7 @@ import platform
 COMPILER="clang++ -std=c++14"   # The compiler we want to use 
                                 #(You may try g++ if you have trouble)
 SOURCE="./src/*.cpp"    # Where the source code lives
-EXECUTABLE="lab"        # Name of the final executable
+EXECUTABLE="lab_Enable3d"        # Name of the final executable
 # ======================= COMMON CONFIGURATION OPTIONS ======================= #
 
 # (2)=================== Platform specific configuration ===================== #

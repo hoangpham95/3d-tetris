@@ -48,6 +48,7 @@ class Cube {
   Cube* DuplicateCubeUnit();
   // update the entire Cube Unit location based on the location of this
   void UpdateCubeUnitLocation();
+    void UpdateCubeUnitLocation(float dx, float dy, float dz);
   // rotate the whole piece of cubes that are connecting to this cube
   // when ccw = true, it is rotating counterclockwise with the given axis
   void RotateCubeUnitOverX(bool ccw = true);

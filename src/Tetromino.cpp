@@ -62,13 +62,13 @@ void Tetromino::Move(Direction d) {
         m_Cubes[i]->m_y -= 1;
       }
       break;
-    case D_LEFT:
+    case D_XNEG:
       m_Center->m_x -= 1;
       for (int i = 0; i < m_Cubes.size(); i++) {
         m_Cubes[i]->m_x -= 1;
       }
       break;
-    case D_RIGHT:
+    case D_XPOS:
       std::cout << "Tetromino: Move right" << std::endl;
       m_Center->m_x += 1;
       for (int i = 0; i < m_Cubes.size(); i++) {

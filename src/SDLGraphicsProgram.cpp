@@ -286,7 +286,7 @@ void SDLGraphicsProgram::loop() {
 
     glm::mat4 model = glm::mat4(1.0f);
     // the first translate is for pushing the entire tetris world back
-    model = glm::translate(model, glm::vec3(0.0f, -5.0f, -20.0f));
+    model = glm::translate(model, glm::vec3(0.0f, -3.0f, -20.0f));
     // the rotate is for rotating the tetris itself
     model = glm::rotate(model, rotate, glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
@@ -295,7 +295,8 @@ void SDLGraphicsProgram::loop() {
                                             -(float)tetris.GetZ() / 2.0f));
 
     glm::mat4 view =
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -5.0f),
+        glm::lookAt(glm::vec3(0.0f, 1.0f, 0.0f),
+                    glm::vec3(0.0f, 0.0f, -5.0f),
                     glm::vec3(0.0f, 1.0f, 0.0f));
 
     GLint modelUniformLocation = glGetUniformLocation(shader, "model");
@@ -333,20 +334,68 @@ void SDLGraphicsProgram::loop() {
             case SDLK_q:  // pressed q
               quit = true;
               break;
+            case SDLK_1:
+                  m_Rotation = R3_XCCW;
+                  break;
+              case SDLK_2:
+                  m_Rotation = R3_XCW;
+                  break;
+              case SDLK_3:
+                  m_Rotation = R3_YCCW;
+                  break;
+              case SDLK_4:
+                  m_Rotation = R3_YCW;
+                  break;
+              case SDLK_5:
+                  m_Rotation = R3_ZCCW;
+                  break;
+              case SDLK_6:
+                  m_Rotation = R3_ZCW;
+                  break;
             case SDLK_LEFT:
-              m_Direction =
-                  (rotate < PI / 4 && rotate > -PI / 4) ? D_LEFT : D_RIGHT;
+                  if(rotate < PI/4.0f && rotate > -PI/4.0f) {
+                      m_Direction = D_XNEG;
+                  } else if (rotate > PI/4.0f && rotate < 3.0f*PI/4.0f) {
+                      m_Direction = D_ZNEG;
+                  } else if (rotate > 3.0f*PI/4.0f || rotate < -3.0f*PI/4.0f) {
+                      m_Direction = D_XPOS;
+                  } else {
+                      m_Direction = D_ZPOS;
+                  }
               break;
             case SDLK_RIGHT:
-              m_Direction =
-                  (rotate < PI / 4 && rotate > -PI / 4) ? D_RIGHT : D_LEFT;
+                  if(rotate < PI/4.0f && rotate > -PI/4.0f) {
+                      m_Direction = D_XPOS;
+                  } else if (rotate > PI/4.0f && rotate < 3*PI/4.0f) {
+                      m_Direction = D_ZPOS;
+                  } else if (rotate > 3*PI/4.0f || rotate < -3*PI/4.0f) {
+                      m_Direction = D_XNEG;
+                  } else {
+                      m_Direction = D_ZNEG;
+                  }
               break;
-            case SDLK_r:
-              m_Rotation = R_CW;
-              break;
-            case SDLK_t:
-              m_Rotation = R_CCW;
-              break;
+            case SDLK_UP:
+                  if(rotate < PI/4.0f && rotate > -PI/4.0f) {
+                      m_Direction = D_ZNEG;
+                  } else if (rotate > PI/4.0f && rotate < 3*PI/4.0f) {
+                      m_Direction = D_XPOS;
+                  } else if (rotate > 3*PI/4.0f || rotate < -3*PI/4.0f) {
+                      m_Direction = D_ZPOS;
+                  } else {
+                      m_Direction = D_XNEG;
+                  }
+                  break;
+              case SDLK_DOWN:
+                  if(rotate < PI/4.0f && rotate > -PI/4.0f) {
+                      m_Direction = D_ZPOS;
+                  } else if (rotate > PI/4.0f && rotate < 3*PI/4.0f) {
+                      m_Direction = D_XNEG;
+                  } else if (rotate > 3*PI/4.0f || rotate < -3*PI/4.0f) {
+                      m_Direction = D_ZNEG;
+                  } else {
+                      m_Direction = D_XPOS;
+                  }
+                  break;
             default:
               m_Direction = D_DOWN;
               m_Rotation = R_NONE;
@@ -360,11 +409,11 @@ void SDLGraphicsProgram::loop() {
           isMouseButtonDown = true;
         case SDL_MOUSEMOTION:
           if (isMouseButtonDown) {
-            rotate = (float)e.motion.x / screenWidth * 10;
+            rotate = (float)e.motion.x / screenWidth * 10.0f;
             if (rotate > PI) {
-              rotate -= PI;
+              rotate -= 2*PI;
             } else if (rotate < -PI) {
-              rotate += PI;
+              rotate += 2*PI;
             }
           }
           break;
@@ -519,34 +568,5 @@ void SDLGraphicsProgram::getOpenGLVersionInfo() {
             << "\n";
 }
 
-// handle key down event
-void SDLGraphicsProgram::HandleKeyDown(bool& quit, SDL_KeyboardEvent* pe) {
-  switch (pe->keysym.sym) {
-    case SDLK_w:  // pressed 2
-      m_isFilled = !m_isFilled;
-      m_isFilled ? glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-                 : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      break;
-    case SDLK_q:  // pressed q
-      quit = true;
-      break;
-    case SDLK_LEFT:
-      m_Direction = D_LEFT;
-      break;
-    case SDLK_RIGHT:
-      m_Direction = D_RIGHT;
-      break;
-    case SDLK_r:
-      m_Rotation = R_CW;
-      break;
-    case SDLK_t:
-      m_Rotation = R_CCW;
-      break;
-    default:
-      m_Direction = D_DOWN;
-      m_Rotation = R_NONE;
-      break;
-  }
-}
 
-// handle mouse drag event
+
