@@ -81,7 +81,6 @@ void Cube::SetLocation(float x, float y, float z) {
 std::vector<Cube*>& Cube::GetCubeUnit() {
   // initialize output
   std::vector<Cube*>* output = new std::vector<Cube*>();
-  output->push_back(this);
 
   std::unordered_set<Cube*> visited;
   std::unordered_set<Cube*> next;

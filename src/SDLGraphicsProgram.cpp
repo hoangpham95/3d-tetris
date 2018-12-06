@@ -351,7 +351,7 @@ void SDLGraphicsProgram::loop() {
                       m_Direction = D_XNEG;
                   } else if (rotate > PI/4.0f && rotate < 3.0f*PI/4.0f) {
                       m_Direction = D_ZNEG;
-                  } else if (rotate > 3.0f*PI/4.0f && rotate < -3.0f*PI/4.0f) {
+                  } else if (rotate > 3.0f*PI/4.0f || rotate < -3.0f*PI/4.0f) {
                       m_Direction = D_XPOS;
                   } else {
                       m_Direction = D_ZPOS;
@@ -362,35 +362,34 @@ void SDLGraphicsProgram::loop() {
                       m_Direction = D_XPOS;
                   } else if (rotate > PI/4.0f && rotate < 3*PI/4.0f) {
                       m_Direction = D_ZPOS;
-                  } else if (rotate > 3*PI/4.0f && rotate < -3*PI/4.0f) {
+                  } else if (rotate > 3*PI/4.0f || rotate < -3*PI/4.0f) {
                       m_Direction = D_XNEG;
                   } else {
                       m_Direction = D_ZNEG;
                   }
               break;
-//            case SDLK_UP:
-//                  if(rotate < -PI/2) {
-//                      m_Direction = D_BACK;
-//                  } else if (rotate < 0) {
-//                      m_Direction = D_LEFT;
-//                  } else if (rotate < PI/2) {
-//                      m_Direction = D_FRONT;
-//                  } else {
-//                      m_Direction = D_RIGHT;
-//                  }
-//                  break;
-//              case SDLK_DOWN:
-//                  if(rotate < -PI/2) {
-//                      m_Direction = D_FRONT;
-//                  } else if (rotate < 0) {
-//                      m_Direction = D_RIGHT;
-//                  } else if (rotate < PI/2) {
-//                      m_Direction = D_BACK;
-//                  } else {
-//                      m_Direction = D_LEFT;
-//                  }
-//                  m_Direction = D_FRONT;
-//                  break;
+            case SDLK_UP:
+                  if(rotate < PI/4.0f && rotate > -PI/4.0f) {
+                      m_Direction = D_ZNEG;
+                  } else if (rotate > PI/4.0f && rotate < 3*PI/4.0f) {
+                      m_Direction = D_XPOS;
+                  } else if (rotate > 3*PI/4.0f || rotate < -3*PI/4.0f) {
+                      m_Direction = D_ZPOS;
+                  } else {
+                      m_Direction = D_XNEG;
+                  }
+                  break;
+              case SDLK_DOWN:
+                  if(rotate < PI/4.0f && rotate > -PI/4.0f) {
+                      m_Direction = D_ZPOS;
+                  } else if (rotate > PI/4.0f && rotate < 3*PI/4.0f) {
+                      m_Direction = D_XNEG;
+                  } else if (rotate > 3*PI/4.0f || rotate < -3*PI/4.0f) {
+                      m_Direction = D_ZNEG;
+                  } else {
+                      m_Direction = D_XPOS;
+                  }
+                  break;
             default:
               m_Direction = D_DOWN;
               m_Rotation = R_NONE;
